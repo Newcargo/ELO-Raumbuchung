@@ -236,6 +236,7 @@ const I18N = {
     save: "Speichern", bookSubmit: "Buchen", cancel: "Abbrechen", close: "Schliessen",
     bookingDetails: "Buchungsdetails", cancelBooking: "Buchung stornieren",
     partOfSeries: "Teil einer Serie", seriesCancelPrompt: "Diese Buchung gehört zu einer Serie. Was möchtest du stornieren?",
+    seriesEditPrompt: "Diese Buchung gehört zu einer Serie. Änderungen (inkl. Raum) auf nur diesen Termin oder auf die ganze Serie anwenden?",
     cancelThisOnly: "Nur diesen Termin", cancelSeries: "Ganze Serie", editSeriesHint: "Änderungen gelten nur für diesen einen Termin der Serie.",
     confirm: "Bestätigen",
     onlyCreatorHint: "Nur {name} (Ersteller/in) oder ein Admin kann diese Buchung stornieren.",
@@ -253,7 +254,7 @@ const I18N = {
     dangerZone: "Gefahrenzone", deleteAll: "Alle Buchungen löschen", deleteAllConfirm: "Wirklich ALLE Buchungen unwiderruflich löschen?",
     noBookings: "Keine Buchungen für diesen Raum.", pickRoom: "Raum wählen",
     savedOk: "Gespeichert.", bookedOk: "Buchung erstellt.", cancelledOk: "Buchung storniert.",
-    conflict: "Dieser Zeitraum ist bereits belegt oder liegt ausserhalb der Regeln.",
+    conflict: "Dieser Zeitraum ist bereits belegt.", durationInvalid: "Die Dauer entspricht nicht den Buchungsregeln.", outsideHours: "Diese Zeit liegt ausserhalb der Öffnungszeiten.",
     fillRequired: "Bitte alle Pflichtfelder ausfüllen.", scanHint: "Scannen für direkte Buchung dieses Raums",
     printAll: "Alle drucken", addCompany: "Firma hinzufügen", removeRoomConfirm: "Raum wirklich löschen? Bestehende Buchungen bleiben erhalten.",
     ruagOnly: "Nur für RUAG buchbar", ruagOnlyBadge: "RUAG intern", ruagOnlyHint: "Dieser Raum kann nur mit Firma \"RUAG\" gebucht werden.", ruagOnlyBlock: "Dieser Raum ist nur für RUAG-Mitarbeitende buchbar.",
@@ -272,6 +273,7 @@ const I18N = {
     save: "Save", bookSubmit: "Book", cancel: "Cancel", close: "Close",
     bookingDetails: "Booking details", cancelBooking: "Cancel booking",
     partOfSeries: "Part of a series", seriesCancelPrompt: "This booking is part of a series. What would you like to cancel?",
+    seriesEditPrompt: "This booking is part of a series. Apply changes (incl. room) to just this occurrence, or the whole series?",
     cancelThisOnly: "Just this occurrence", cancelSeries: "Whole series", editSeriesHint: "Changes only apply to this one occurrence of the series.",
     confirm: "Confirm",
     onlyCreatorHint: "Only {name} (creator) or an admin can cancel this booking.",
@@ -289,7 +291,7 @@ const I18N = {
     dangerZone: "Danger zone", deleteAll: "Delete all bookings", deleteAllConfirm: "Really delete ALL bookings permanently?",
     noBookings: "No bookings for this room.", pickRoom: "Select room",
     savedOk: "Saved.", bookedOk: "Booking created.", cancelledOk: "Booking cancelled.",
-    conflict: "This time slot is already booked or outside the rules.",
+    conflict: "This time slot is already booked.", durationInvalid: "The duration doesn't match the booking rules.", outsideHours: "This time is outside opening hours.",
     fillRequired: "Please fill in all required fields.", scanHint: "Scan to book this room directly",
     printAll: "Print all", addCompany: "Add company", removeRoomConfirm: "Really delete this room? Existing bookings are kept.",
     ruagOnly: "RUAG-only room", ruagOnlyBadge: "RUAG internal", ruagOnlyHint: "This room can only be booked with company \"RUAG\".", ruagOnlyBlock: "This room can only be booked by RUAG staff.",
@@ -308,6 +310,7 @@ const I18N = {
     save: "Enregistrer", bookSubmit: "Réserver", cancel: "Annuler", close: "Fermer",
     bookingDetails: "Détails de la réservation", cancelBooking: "Annuler la réservation",
     partOfSeries: "Fait partie d'une série", seriesCancelPrompt: "Cette réservation fait partie d'une série. Que souhaitez-vous annuler ?",
+    seriesEditPrompt: "Cette réservation fait partie d'une série. Appliquer les modifications (y compris la salle) à cette occurrence seulement, ou à toute la série ?",
     cancelThisOnly: "Seulement cette occurrence", cancelSeries: "Toute la série", editSeriesHint: "Les modifications ne s'appliquent qu'à cette occurrence de la série.",
     confirm: "Confirmer",
     onlyCreatorHint: "Seul(e) {name} (créateur/trice) ou un administrateur peut annuler cette réservation.",
@@ -325,7 +328,7 @@ const I18N = {
     dangerZone: "Zone à risque", deleteAll: "Supprimer toutes les réservations", deleteAllConfirm: "Vraiment supprimer TOUTES les réservations définitivement ?",
     noBookings: "Aucune réservation pour cette salle.", pickRoom: "Choisir une salle",
     savedOk: "Enregistré.", bookedOk: "Réservation créée.", cancelledOk: "Réservation annulée.",
-    conflict: "Ce créneau est déjà réservé ou hors des règles définies.",
+    conflict: "Ce créneau est déjà réservé.", durationInvalid: "La durée ne respecte pas les règles de réservation.", outsideHours: "Cette heure est en dehors des heures d'ouverture.",
     fillRequired: "Veuillez remplir tous les champs obligatoires.", scanHint: "Scanner pour réserver directement cette salle",
     printAll: "Tout imprimer", addCompany: "Ajouter une entreprise", removeRoomConfirm: "Vraiment supprimer cette salle ? Les réservations existantes sont conservées.",
     ruagOnly: "Salle réservée à RUAG", ruagOnlyBadge: "RUAG interne", ruagOnlyHint: "Cette salle ne peut être réservée qu'avec l'entreprise \"RUAG\".", ruagOnlyBlock: "Cette salle ne peut être réservée que par le personnel RUAG.",
@@ -334,7 +337,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "1.9.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -510,6 +513,17 @@ async function updateBookingDb(id, changes){
     return true;
   }catch(e){
     console.error('updateBookingDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function updateSeriesDb(seriesId, changes){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').update(changes).eq('series_id', seriesId), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('updateSeriesDb failed', e);
     toast(t('saveFailed'), true);
     return false;
   }
@@ -1007,10 +1021,10 @@ async function submitBooking(roomId){
   const startM = timeToMin(start), endM = timeToMin(end);
   const dur = endM - startM;
   if(dur <= 0 || dur < s.minDurationMinutes || dur > s.maxDurationMinutes){
-    toast(t('conflict'), true); return;
+    toast(`${t('durationInvalid')} (${s.minDurationMinutes}–${s.maxDurationMinutes} min)`, true); return;
   }
   if(startM < timeToMin(s.openStart) || endM > timeToMin(s.openEnd)){
-    toast(t('conflict'), true); return;
+    toast(`${t('outsideHours')} (${s.openStart}–${s.openEnd})`, true); return;
   }
 
   const datesToBook = [date];
@@ -1063,6 +1077,9 @@ function openEditBookingModal(bookingId){
   const s = state.settings;
   const maxDate = fmtDate(addDays(new Date(), s.leadTimeDays));
   const minDate = fmtDate(new Date());
+  const roomOptions = activeRooms().slice();
+  if(room && !roomOptions.find(r=>r.id===room.id)) roomOptions.unshift(room); // keep current room selectable even if deactivated
+  const roomOpts = roomOptions.map(r=>`<option value="${r.id}" ${r.id===b.roomId?'selected':''}>${escapeHtml(r.name)}${r.ruagOnly?' 🔒':''}</option>`).join('');
   const companyList = room && room.ruagOnly ? s.companies.filter(c=>c.trim().toLowerCase()==='ruag') : s.companies;
   const companiesOpts = (companyList.length ? companyList : s.companies).map(c=>`<option value="${escapeHtml(c)}" ${c===b.company?'selected':''}>${escapeHtml(c)}</option>`).join('');
 
@@ -1070,10 +1087,14 @@ function openEditBookingModal(bookingId){
   <div class="overlay" id="overlayEdit">
     <div class="modal">
       <div class="modal-head">
-        <h3>${t('edit')} — <span style="color:${room?room.color:''}">${escapeHtml(room?room.name:'')}</span></h3>
+        <h3>${t('edit')}</h3>
         <button class="close-x" id="closeEdit">✕</button>
       </div>
       <div class="modal-body">
+        <div class="field">
+          <label>${t('room')}</label>
+          <select id="eRoom">${roomOpts}</select>
+        </div>
         <div class="row2">
           <div class="field"><label>${t('date')}</label><input type="date" id="eDate" value="${b.date}" min="${minDate}" max="${maxDate}"></div>
           <div class="field"></div>
@@ -1084,10 +1105,10 @@ function openEditBookingModal(bookingId){
         </div>
         <div class="hint">${t('interval')}: ${s.bookingIntervalMinutes} min · ${t('minDur')}: ${s.minDurationMinutes} · ${t('maxDur')}: ${s.maxDurationMinutes}</div>
         <div class="field" style="margin-top:14px;"><label>${t('name')} *</label><input type="text" id="eName" value="${escapeHtml(b.name)}"></div>
-        <div class="field">
+        <div class="field" id="eCompanyField">
           <label>${t('company')} ${s.requireCompany?'*':''}</label>
           <select id="eCompany" ${room && room.ruagOnly?'disabled':''}>${companiesOpts}</select>
-          ${room && room.ruagOnly ? `<div class="hint" style="color:var(--amber);">🔒 ${t('ruagOnlyHint')}</div>` : ''}
+          <div class="hint" id="eRuagHint" style="color:var(--amber);${room && room.ruagOnly?'':'display:none;'}">🔒 ${t('ruagOnlyHint')}</div>
         </div>
         <div class="field"><label>${t('title')}</label><input type="text" id="eTitle" value="${escapeHtml(b.title||'')}"></div>
         <div class="field"><label>${t('email')} ${s.requireEmail?'*':''}</label><input type="email" id="eEmail" value="${escapeHtml(b.email||'')}"></div>
@@ -1102,13 +1123,26 @@ function openEditBookingModal(bookingId){
   const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
   document.getElementById('closeEdit').onclick = close;
   document.getElementById('cancelEdit').onclick = close;
+
+  const roomSelect = document.getElementById('eRoom');
+  roomSelect.onchange = ()=>{
+    const selectedRoom = state.rooms.find(r=>r.id===roomSelect.value);
+    const isRuag = !!(selectedRoom && selectedRoom.ruagOnly);
+    const companySelect = document.getElementById('eCompany');
+    const list = isRuag ? s.companies.filter(c=>c.trim().toLowerCase()==='ruag') : s.companies;
+    companySelect.innerHTML = (list.length?list:s.companies).map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    companySelect.disabled = isRuag;
+    if(isRuag) companySelect.value = s.companies.find(c=>c.trim().toLowerCase()==='ruag') || companySelect.value;
+    document.getElementById('eRuagHint').style.display = isRuag ? 'block' : 'none';
+  };
   document.getElementById('overlayEdit').onclick = (e)=>{ if(e.target.id==='overlayEdit') close(); };
   document.getElementById('submitEdit').onclick = ()=>submitEditBooking(b);
 }
 
 function submitEditBooking(b){
   const s = state.settings;
-  const room = state.rooms.find(r=>r.id===b.roomId);
+  const newRoomId = document.getElementById('eRoom').value;
+  const room = state.rooms.find(r=>r.id===newRoomId);
   if(room && room.ruagOnly){
     const companyVal = document.getElementById('eCompany').value;
     if(!companyVal || companyVal.trim().toLowerCase()!=='ruag'){ toast(t('ruagOnlyBlock'), true); return; }
@@ -1128,25 +1162,90 @@ function submitEditBooking(b){
   const startM = timeToMin(start), endM = timeToMin(end);
   const dur = endM - startM;
   if(dur <= 0 || dur < s.minDurationMinutes || dur > s.maxDurationMinutes){
-    toast(t('conflict'), true); return;
+    toast(`${t('durationInvalid')} (${s.minDurationMinutes}–${s.maxDurationMinutes} min)`, true); return;
   }
   if(startM < timeToMin(s.openStart) || endM > timeToMin(s.openEnd)){
-    toast(t('conflict'), true); return;
+    toast(`${t('outsideHours')} (${s.openStart}–${s.openEnd})`, true); return;
   }
 
+  const changes = { roomId:newRoomId, date, startTime:start, endTime:end, name, company, title, email };
+
+  if(b.seriesId){
+    const seriesMembers = state.bookings.filter(x=>x.seriesId===b.seriesId);
+    if(seriesMembers.length > 1){
+      showEditScopeChoice(()=>applyEditToOne(b, changes), ()=>applyEditToSeries(b, changes));
+      return;
+    }
+  }
+  applyEditToOne(b, changes);
+}
+
+function showEditScopeChoice(onOne, onSeries){
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="overlay" id="overlayEditScope">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal-head"><h3>${t('edit')}</h3><button class="close-x" id="closeEditScope">✕</button></div>
+      <div class="modal-body">
+        <div style="font-size:14px;line-height:1.5;">${t('seriesEditPrompt')}</div>
+      </div>
+      <div class="modal-foot" style="flex-wrap:wrap;">
+        <button class="btn ghost" id="closeEditScope2">${t('cancel')}</button>
+        <button class="btn ghost" id="editOneBtn">${t('cancelThisOnly')}</button>
+        <button class="btn primary" id="editSeriesBtn">${t('cancelSeries')}</button>
+      </div>
+    </div>
+  </div>`;
+  const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
+  document.getElementById('closeEditScope').onclick = close;
+  document.getElementById('closeEditScope2').onclick = close;
+  document.getElementById('editOneBtn').onclick = onOne;
+  document.getElementById('editSeriesBtn').onclick = onSeries;
+}
+
+function applyEditToOne(b, changes){
+  const s = state.settings;
   const buf = s.bufferMinutes||0;
+  const startM = timeToMin(changes.startTime), endM = timeToMin(changes.endTime);
   const conflict = state.bookings.some(other=>{
-    if(other.id===b.id) return false; // exclude itself
-    if(other.roomId!==b.roomId || other.date!==date) return false;
+    if(other.id===b.id) return false;
+    if(other.roomId!==changes.roomId || other.date!==changes.date) return false;
     return overlaps(startM-buf, endM+buf, timeToMin(other.startTime), timeToMin(other.endTime));
   });
-  if(conflict){ toast(t('conflict'), true); return; }
+  if(conflict){ toast(`${t('conflict')} (${changes.date})`, true); return; }
 
-  Object.assign(b, { date, startTime:start, endTime:end, name, company, title, email });
+  Object.assign(b, changes);
   document.getElementById('modalRoot').innerHTML='';
   render();
   updateBookingDb(b.id, {
-    date, start_time:start, end_time:end, name, company, title, email
+    room_id: changes.roomId, date: changes.date, start_time: changes.startTime, end_time: changes.endTime,
+    name: changes.name, company: changes.company, title: changes.title, email: changes.email
+  }).then(ok=>{ if(ok) toast(t('savedOk')); });
+}
+
+function applyEditToSeries(b, changes){
+  const s = state.settings;
+  const buf = s.bufferMinutes||0;
+  const startM = timeToMin(changes.startTime), endM = timeToMin(changes.endTime);
+  const seriesMembers = state.bookings.filter(x=>x.seriesId===b.seriesId);
+
+  for(const member of seriesMembers){
+    const conflict = state.bookings.some(other=>{
+      if(other.seriesId===b.seriesId) return false; // ignore other series members, they're moving together
+      if(other.roomId!==changes.roomId || other.date!==member.date) return false;
+      return overlaps(startM-buf, endM+buf, timeToMin(other.startTime), timeToMin(other.endTime));
+    });
+    if(conflict){ toast(`${t('conflict')} (${member.date})`, true); return; }
+  }
+
+  seriesMembers.forEach(member=>{
+    Object.assign(member, { roomId:changes.roomId, startTime:changes.startTime, endTime:changes.endTime,
+      name:changes.name, company:changes.company, title:changes.title, email:changes.email });
+  });
+  document.getElementById('modalRoot').innerHTML='';
+  render();
+  updateSeriesDb(b.seriesId, {
+    room_id: changes.roomId, start_time: changes.startTime, end_time: changes.endTime,
+    name: changes.name, company: changes.company, title: changes.title, email: changes.email
   }).then(ok=>{ if(ok) toast(t('savedOk')); });
 }
 
