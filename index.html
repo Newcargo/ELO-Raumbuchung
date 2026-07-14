@@ -325,7 +325,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -428,34 +428,68 @@ async function loadData(){
   }
 }
 
-async function saveConfig(){
+async function saveSettings(){
   try{
-    const delRes = await withTimeout(sbClient.from('rooms').delete().neq('id','__never_matches__'), 8000);
-    if(delRes.error) throw delRes.error;
-    if(state.rooms.length){
-      const insRes = await withTimeout(sbClient.from('rooms').insert(state.rooms.map(mapRoomToDb)), 8000);
-      if(insRes.error) throw insRes.error;
-    }
-    const setRes = await withTimeout(sbClient.from('app_settings').update({ data: state.settings }).eq('id',1), 8000);
-    if(setRes.error) throw setRes.error;
+    const res = await withTimeout(sbClient.from('app_settings').update({ data: state.settings }).eq('id',1), 8000);
+    if(res.error) throw res.error;
     return true;
   }catch(e){
-    console.error('saveConfig failed', e);
+    console.error('saveSettings failed', e);
     toast(t('saveFailed'), true);
     return false;
   }
 }
-async function saveBookings(){
+async function upsertRoom(room){
   try{
-    const delRes = await withTimeout(sbClient.from('bookings').delete().neq('id','__never_matches__'), 8000);
-    if(delRes.error) throw delRes.error;
-    if(state.bookings.length){
-      const insRes = await withTimeout(sbClient.from('bookings').insert(state.bookings.map(mapBookingToDb)), 8000);
-      if(insRes.error) throw insRes.error;
-    }
+    const res = await withTimeout(sbClient.from('rooms').upsert(mapRoomToDb(room)), 8000);
+    if(res.error) throw res.error;
     return true;
   }catch(e){
-    console.error('saveBookings failed', e);
+    console.error('upsertRoom failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function deleteRoomDb(id){
+  try{
+    const res = await withTimeout(sbClient.from('rooms').delete().eq('id', id), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('deleteRoomDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function insertBookings(bookings){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').insert(bookings.map(mapBookingToDb)), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('insertBookings failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function deleteBookingDb(id){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').delete().eq('id', id), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('deleteBookingDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function deleteAllBookingsDb(){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').delete().neq('id','__never_matches__'), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('deleteAllBookingsDb failed', e);
     toast(t('saveFailed'), true);
     return false;
   }
@@ -972,7 +1006,7 @@ async function submitBooking(roomId){
   state.weekRoomId = roomId;
   closeModal();
   render();
-  saveBookings().then(ok=>{ if(ok) toast(t('bookedOk')); });
+  insertBookings(newBookings).then(ok=>{ if(ok) toast(t('bookedOk')); });
   try{ localStorage.setItem('my-bookings', JSON.stringify(state.myBookings)); }catch(e){}
 }
 
@@ -1012,7 +1046,7 @@ async function doCancel(bookingId){
   state.bookings = state.bookings.filter(b=>b.id!==bookingId);
   document.getElementById('modalRoot').innerHTML='';
   render();
-  saveBookings().then(ok=>{ if(ok) toast(t('cancelledOk')); });
+  deleteBookingDb(bookingId).then(ok=>{ if(ok) toast(t('cancelledOk')); });
 }
 
 /* ---------------- Admin: Login / Setup ---------------- */
@@ -1211,10 +1245,10 @@ function attachAdminEvents(){
     document.querySelectorAll('[data-act="delroom"]').forEach(el=>{
       el.onclick = ()=>{
         const id = el.closest('tr').getAttribute('data-room');
-        showConfirm(t('removeRoomConfirm'), async ()=>{
+        showConfirm(t('removeRoomConfirm'), ()=>{
           state.rooms = state.rooms.filter(r=>r.id!==id);
           render();
-          saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+          deleteRoomDb(id).then(ok=>{ if(ok) toast(t('savedOk')); });
         });
       };
     });
@@ -1224,25 +1258,25 @@ function attachAdminEvents(){
     const del = document.getElementById('deleteAllBtn');
     if(del) del.onclick = ()=>{
       showConfirm(t('deleteAllConfirm'), ()=>{
-        showConfirm(t('deleteAllConfirm'), async ()=>{
+        showConfirm(t('deleteAllConfirm'), ()=>{
           state.bookings = [];
           render();
-          saveBookings().then(ok=>{ if(ok) toast(t('savedOk')); });
+          deleteAllBookingsDb().then(ok=>{ if(ok) toast(t('savedOk')); });
         });
       });
     };
     const save = document.getElementById('saveGeneralBtn');
-    if(save) save.onclick = async ()=>{
+    if(save) save.onclick = ()=>{
       state.settings.defaultView = document.getElementById('setDefView').value;
       state.settings.allowWeekends = document.getElementById('setWeekends').checked;
       render();
-      saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+      saveSettings().then(ok=>{ if(ok) toast(t('savedOk')); });
     };
   }
 
   if(state.adminTab==='booking'){
     const save = document.getElementById('saveBookingBtn');
-    if(save) save.onclick = async ()=>{
+    if(save) save.onclick = ()=>{
       const s = state.settings;
       s.bookingIntervalMinutes = parseInt(document.getElementById('setInterval').value)||30;
       s.bufferMinutes = parseInt(document.getElementById('setBuffer').value)||0;
@@ -1256,26 +1290,26 @@ function attachAdminEvents(){
       s.allowRecurring = document.getElementById('setAllowRecurring').checked;
       s.onlyCreatorCanCancel = document.getElementById('setOnlyCreator').checked;
       render();
-      saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+      saveSettings().then(ok=>{ if(ok) toast(t('savedOk')); });
     };
   }
 
   if(state.adminTab==='companies'){
     const addBtn = document.getElementById('addCompanyBtn');
-    if(addBtn) addBtn.onclick = async ()=>{
+    if(addBtn) addBtn.onclick = ()=>{
       const input = document.getElementById('newCompanyInput');
       const val = input.value.trim();
       if(val && !state.settings.companies.includes(val)){
         state.settings.companies.push(val);
         render();
-        saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+        saveSettings().then(ok=>{ if(ok) toast(t('savedOk')); });
       }
     };
     document.querySelectorAll('[data-company]').forEach(el=>{
-      el.onclick = async ()=>{
+      el.onclick = ()=>{
         state.settings.companies = state.settings.companies.filter(c=>c!==el.getAttribute('data-company'));
         render();
-        saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+        saveSettings().then(ok=>{ if(ok) toast(t('savedOk')); });
       };
     });
   }
@@ -1301,7 +1335,7 @@ function openRoomForm(room){
   const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
   document.getElementById('closeRoomForm').onclick = close;
   document.getElementById('cancelRoomForm').onclick = close;
-  document.getElementById('saveRoomForm').onclick = async ()=>{
+  document.getElementById('saveRoomForm').onclick = ()=>{
     const name = document.getElementById('rfName').value.trim();
     if(!name){ toast(t('fillRequired'), true); return; }
     const data = {
@@ -1313,13 +1347,16 @@ function openRoomForm(room){
       active: document.getElementById('rfActive').checked,
       ruagOnly: document.getElementById('rfRuagOnly').checked,
     };
+    let savedRoom;
     if(room){
       Object.assign(room, data);
+      savedRoom = room;
     } else {
-      state.rooms.push({ id: uid(), ...data });
+      savedRoom = { id: uid(), ...data };
+      state.rooms.push(savedRoom);
     }
     close(); render();
-    saveConfig().then(ok=>{ if(ok) toast(t('savedOk')); });
+    upsertRoom(savedRoom).then(ok=>{ if(ok) toast(t('savedOk')); });
   };
 }
 
