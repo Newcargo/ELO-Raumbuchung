@@ -231,9 +231,12 @@ const I18N = {
     bookRoom: "Raum buchen", room: "Raum", date: "Datum", start: "Von", end: "Bis",
     name: "Name", company: "Firma", title: "Titel / Zweck", email: "E-Mail (optional)",
     recurring: "Wiederholen", weeks: "Anzahl Wochen", onWeekdays: "An diesen Wochentagen",
+    repeatEvery: "Wiederholen alle", weekUnit: "Woche(n)",
     wd0: "So", wd1: "Mo", wd2: "Di", wd3: "Mi", wd4: "Do", wd5: "Fr", wd6: "Sa",
     save: "Speichern", bookSubmit: "Buchen", cancel: "Abbrechen", close: "Schliessen",
     bookingDetails: "Buchungsdetails", cancelBooking: "Buchung stornieren",
+    partOfSeries: "Teil einer Serie", seriesCancelPrompt: "Diese Buchung gehört zu einer Serie. Was möchtest du stornieren?",
+    cancelThisOnly: "Nur diesen Termin", cancelSeries: "Ganze Serie", editSeriesHint: "Änderungen gelten nur für diesen einen Termin der Serie.",
     confirm: "Bestätigen",
     onlyCreatorHint: "Nur {name} (Ersteller/in) oder ein Admin kann diese Buchung stornieren.",
     onlyCreatorSettingHint: "Erkennung erfolgt über das Gerät/den Browser, mit dem gebucht wurde — kein Code nötig. Admins können immer stornieren.",
@@ -264,9 +267,12 @@ const I18N = {
     bookRoom: "Book room", room: "Room", date: "Date", start: "Start", end: "End",
     name: "Name", company: "Company", title: "Title / purpose", email: "Email (optional)",
     recurring: "Repeat", weeks: "Number of weeks", onWeekdays: "On these weekdays",
+    repeatEvery: "Repeat every", weekUnit: "week(s)",
     wd0: "Su", wd1: "Mo", wd2: "Tu", wd3: "We", wd4: "Th", wd5: "Fr", wd6: "Sa",
     save: "Save", bookSubmit: "Book", cancel: "Cancel", close: "Close",
     bookingDetails: "Booking details", cancelBooking: "Cancel booking",
+    partOfSeries: "Part of a series", seriesCancelPrompt: "This booking is part of a series. What would you like to cancel?",
+    cancelThisOnly: "Just this occurrence", cancelSeries: "Whole series", editSeriesHint: "Changes only apply to this one occurrence of the series.",
     confirm: "Confirm",
     onlyCreatorHint: "Only {name} (creator) or an admin can cancel this booking.",
     onlyCreatorSettingHint: "Recognised by the device/browser used to book — no code needed. Admins can always cancel.",
@@ -297,9 +303,12 @@ const I18N = {
     bookRoom: "Réserver la salle", room: "Salle", date: "Date", start: "Début", end: "Fin",
     name: "Nom", company: "Entreprise", title: "Titre / objet", email: "E-mail (facultatif)",
     recurring: "Répéter", weeks: "Nombre de semaines", onWeekdays: "Ces jours de la semaine",
+    repeatEvery: "Répéter toutes les", weekUnit: "semaine(s)",
     wd0: "Di", wd1: "Lu", wd2: "Ma", wd3: "Me", wd4: "Je", wd5: "Ve", wd6: "Sa",
     save: "Enregistrer", bookSubmit: "Réserver", cancel: "Annuler", close: "Fermer",
     bookingDetails: "Détails de la réservation", cancelBooking: "Annuler la réservation",
+    partOfSeries: "Fait partie d'une série", seriesCancelPrompt: "Cette réservation fait partie d'une série. Que souhaitez-vous annuler ?",
+    cancelThisOnly: "Seulement cette occurrence", cancelSeries: "Toute la série", editSeriesHint: "Les modifications ne s'appliquent qu'à cette occurrence de la série.",
     confirm: "Confirmer",
     onlyCreatorHint: "Seul(e) {name} (créateur/trice) ou un administrateur peut annuler cette réservation.",
     onlyCreatorSettingHint: "Reconnaissance via l'appareil/navigateur utilisé pour réserver — aucun code nécessaire. Les administrateurs peuvent toujours annuler.",
@@ -325,7 +334,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.8.0";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -349,10 +358,10 @@ function mapRoomToDb(r){
   return { id:r.id, name:r.name, floor:r.floor, capacity:r.capacity, equipment:r.equipment, color:r.color, active:r.active, ruag_only:r.ruagOnly };
 }
 function mapBookingFromDb(b){
-  return { id:b.id, roomId:b.room_id, date:b.date, startTime:b.start_time, endTime:b.end_time, name:b.name, company:b.company, title:b.title, email:b.email, createdAt:b.created_at };
+  return { id:b.id, roomId:b.room_id, date:b.date, startTime:b.start_time, endTime:b.end_time, name:b.name, company:b.company, title:b.title, email:b.email, createdAt:b.created_at, seriesId:b.series_id };
 }
 function mapBookingToDb(b){
-  return { id:b.id, room_id:b.roomId, date:b.date, start_time:b.startTime, end_time:b.endTime, name:b.name, company:b.company, title:b.title, email:b.email, created_at:b.createdAt };
+  return { id:b.id, room_id:b.roomId, date:b.date, start_time:b.startTime, end_time:b.endTime, name:b.name, company:b.company, title:b.title, email:b.email, created_at:b.createdAt, series_id:b.seriesId||null };
 }
 
 /* ---------------- State ---------------- */
@@ -490,6 +499,28 @@ async function deleteAllBookingsDb(){
     return true;
   }catch(e){
     console.error('deleteAllBookingsDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function updateBookingDb(id, changes){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').update(changes).eq('id', id), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('updateBookingDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function deleteSeriesDb(seriesId){
+  try{
+    const res = await withTimeout(sbClient.from('bookings').delete().eq('series_id', seriesId), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('deleteSeriesDb failed', e);
     toast(t('saveFailed'), true);
     return false;
   }
@@ -882,6 +913,13 @@ function openBookingModal(roomId, dateStr, startMin){
             <label style="margin:0;text-transform:none;font-size:13px;color:var(--text);" for="bRecurring">${t('recurring')}</label>
           </div>
         </div>
+        <div class="field" id="intervalField" style="display:none;">
+          <label>${t('repeatEvery')}</label>
+          <div class="row2" style="align-items:center;">
+            <input type="number" id="bInterval" min="1" max="12" value="1">
+            <span class="hint" style="margin:0;">${t('weekUnit')}</span>
+          </div>
+        </div>
         <div class="field" id="weekdaysField" style="display:none;">
           <label>${t('onWeekdays')}</label>
           <div class="weekday-picker">
@@ -890,7 +928,7 @@ function openBookingModal(roomId, dateStr, startMin){
         </div>
         <div class="field" id="weeksField" style="display:none;">
           <label>${t('weeks')}</label>
-          <input type="number" id="bWeeks" min="1" max="26" value="4">
+          <input type="number" id="bWeeks" min="1" max="104" value="4">
         </div>` : ''}
       </div>
       <div class="modal-foot">
@@ -904,6 +942,7 @@ function openBookingModal(roomId, dateStr, startMin){
   const rec = document.getElementById('bRecurring');
   if(rec) rec.onchange = ()=>{
     const show = rec.checked ? 'block' : 'none';
+    document.getElementById('intervalField').style.display = show;
     document.getElementById('weekdaysField').style.display = show;
     document.getElementById('weeksField').style.display = show;
   };
@@ -959,6 +998,7 @@ async function submitBooking(roomId){
   const email = document.getElementById('bEmail').value.trim();
   const recurring = document.getElementById('bRecurring') ? document.getElementById('bRecurring').checked : false;
   const weeks = document.getElementById('bWeeks') ? parseInt(document.getElementById('bWeeks').value)||1 : 1;
+  const intervalWeeks = document.getElementById('bInterval') ? Math.max(1, parseInt(document.getElementById('bInterval').value)||1) : 1;
 
   if(!name || !date || !start || !end){ toast(t('fillRequired'), true); return; }
   if(s.requireCompany && !company){ toast(t('fillRequired'), true); return; }
@@ -978,11 +1018,15 @@ async function submitBooking(roomId){
     const selectedDays = Array.from(document.querySelectorAll('.wd-btn.active')).map(b=>parseInt(b.getAttribute('data-day')));
     const days = selectedDays.length ? selectedDays : [parseDate(date).getDay()];
     const startD = parseDate(date);
+    const startWeekStart = startOfWeek(startD);
     const totalDays = weeks * 7;
     datesToBook.length = 0;
     for(let i=0; i<totalDays; i++){
       const d = addDays(startD, i);
-      if(days.includes(d.getDay())) datesToBook.push(fmtDate(d));
+      if(!days.includes(d.getDay())) continue;
+      const dWeekStart = startOfWeek(d);
+      const weeksDiff = Math.round((dWeekStart - startWeekStart) / (7*24*60*60*1000));
+      if(weeksDiff % intervalWeeks === 0) datesToBook.push(fmtDate(d));
     }
     if(!datesToBook.length) datesToBook.push(date);
   }
@@ -996,9 +1040,10 @@ async function submitBooking(roomId){
     if(conflict){ toast(`${t('conflict')} (${dStr})`, true); return; }
   }
 
+  const seriesId = datesToBook.length > 1 ? uid() : null;
   const newBookings = datesToBook.map(dStr=>({
     id: uid(), roomId, date: dStr, startTime: start, endTime: end,
-    name, company, title, email, createdAt: Date.now()
+    name, company, title, email, createdAt: Date.now(), seriesId
   }));
   state.bookings.push(...newBookings);
   state.myBookings.push(...newBookings.map(b=>b.id));
@@ -1010,16 +1055,112 @@ async function submitBooking(roomId){
   try{ localStorage.setItem('my-bookings', JSON.stringify(state.myBookings)); }catch(e){}
 }
 
+/* ---------------- Edit existing booking ---------------- */
+function openEditBookingModal(bookingId){
+  const b = state.bookings.find(x=>x.id===bookingId);
+  if(!b) return;
+  const room = state.rooms.find(r=>r.id===b.roomId);
+  const s = state.settings;
+  const maxDate = fmtDate(addDays(new Date(), s.leadTimeDays));
+  const minDate = fmtDate(new Date());
+  const companyList = room && room.ruagOnly ? s.companies.filter(c=>c.trim().toLowerCase()==='ruag') : s.companies;
+  const companiesOpts = (companyList.length ? companyList : s.companies).map(c=>`<option value="${escapeHtml(c)}" ${c===b.company?'selected':''}>${escapeHtml(c)}</option>`).join('');
+
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="overlay" id="overlayEdit">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>${t('edit')} — <span style="color:${room?room.color:''}">${escapeHtml(room?room.name:'')}</span></h3>
+        <button class="close-x" id="closeEdit">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="row2">
+          <div class="field"><label>${t('date')}</label><input type="date" id="eDate" value="${b.date}" min="${minDate}" max="${maxDate}"></div>
+          <div class="field"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>${t('start')}</label><input type="time" id="eStart" class="mono-input" value="${b.startTime}" step="${s.bookingIntervalMinutes*60}"></div>
+          <div class="field"><label>${t('end')}</label><input type="time" id="eEnd" class="mono-input" value="${b.endTime}" step="${s.bookingIntervalMinutes*60}"></div>
+        </div>
+        <div class="hint">${t('interval')}: ${s.bookingIntervalMinutes} min · ${t('minDur')}: ${s.minDurationMinutes} · ${t('maxDur')}: ${s.maxDurationMinutes}</div>
+        <div class="field" style="margin-top:14px;"><label>${t('name')} *</label><input type="text" id="eName" value="${escapeHtml(b.name)}"></div>
+        <div class="field">
+          <label>${t('company')} ${s.requireCompany?'*':''}</label>
+          <select id="eCompany" ${room && room.ruagOnly?'disabled':''}>${companiesOpts}</select>
+          ${room && room.ruagOnly ? `<div class="hint" style="color:var(--amber);">🔒 ${t('ruagOnlyHint')}</div>` : ''}
+        </div>
+        <div class="field"><label>${t('title')}</label><input type="text" id="eTitle" value="${escapeHtml(b.title||'')}"></div>
+        <div class="field"><label>${t('email')} ${s.requireEmail?'*':''}</label><input type="email" id="eEmail" value="${escapeHtml(b.email||'')}"></div>
+        ${b.seriesId ? `<div class="hint">${t('editSeriesHint')}</div>` : ''}
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="cancelEdit">${t('cancel')}</button>
+        <button class="btn primary" id="submitEdit">${t('save')}</button>
+      </div>
+    </div>
+  </div>`;
+  const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
+  document.getElementById('closeEdit').onclick = close;
+  document.getElementById('cancelEdit').onclick = close;
+  document.getElementById('overlayEdit').onclick = (e)=>{ if(e.target.id==='overlayEdit') close(); };
+  document.getElementById('submitEdit').onclick = ()=>submitEditBooking(b);
+}
+
+function submitEditBooking(b){
+  const s = state.settings;
+  const room = state.rooms.find(r=>r.id===b.roomId);
+  if(room && room.ruagOnly){
+    const companyVal = document.getElementById('eCompany').value;
+    if(!companyVal || companyVal.trim().toLowerCase()!=='ruag'){ toast(t('ruagOnlyBlock'), true); return; }
+  }
+  const date = document.getElementById('eDate').value;
+  const start = document.getElementById('eStart').value;
+  const end = document.getElementById('eEnd').value;
+  const name = document.getElementById('eName').value.trim();
+  const company = document.getElementById('eCompany').value;
+  const title = document.getElementById('eTitle').value.trim();
+  const email = document.getElementById('eEmail').value.trim();
+
+  if(!name || !date || !start || !end){ toast(t('fillRequired'), true); return; }
+  if(s.requireCompany && !company){ toast(t('fillRequired'), true); return; }
+  if(s.requireEmail && !email){ toast(t('fillRequired'), true); return; }
+
+  const startM = timeToMin(start), endM = timeToMin(end);
+  const dur = endM - startM;
+  if(dur <= 0 || dur < s.minDurationMinutes || dur > s.maxDurationMinutes){
+    toast(t('conflict'), true); return;
+  }
+  if(startM < timeToMin(s.openStart) || endM > timeToMin(s.openEnd)){
+    toast(t('conflict'), true); return;
+  }
+
+  const buf = s.bufferMinutes||0;
+  const conflict = state.bookings.some(other=>{
+    if(other.id===b.id) return false; // exclude itself
+    if(other.roomId!==b.roomId || other.date!==date) return false;
+    return overlaps(startM-buf, endM+buf, timeToMin(other.startTime), timeToMin(other.endTime));
+  });
+  if(conflict){ toast(t('conflict'), true); return; }
+
+  Object.assign(b, { date, startTime:start, endTime:end, name, company, title, email });
+  document.getElementById('modalRoot').innerHTML='';
+  render();
+  updateBookingDb(b.id, {
+    date, start_time:start, end_time:end, name, company, title, email
+  }).then(ok=>{ if(ok) toast(t('savedOk')); });
+}
+
 /* ---------------- Booking Detail / Cancel ---------------- */
 function openBookingDetail(bookingId){
   const b = state.bookings.find(x=>x.id===bookingId);
   if(!b) return;
   const room = state.rooms.find(r=>r.id===b.roomId);
   const canCancel = state.isAdmin || !state.settings.onlyCreatorCanCancel || state.myBookings.includes(b.id);
+  const isSeries = !!b.seriesId;
   document.getElementById('modalRoot').innerHTML = `
   <div class="overlay" id="overlay3">
     <div class="modal">
-      <div class="modal-head"><h3>${t('bookingDetails')}</h3><button class="close-x" id="closeDetail">✕</button></div>
+      <div class="modal-head"><h3>${t('bookingDetails')}${isSeries ? ` <span class="hint" style="display:inline;text-transform:none;">(${t('partOfSeries')})</span>` : ''}</h3><button class="close-x" id="closeDetail">✕</button></div>
       <div class="modal-body">
         <div class="info-line"><span class="k">${t('room')}</span><span class="v" style="color:${room?room.color:''}">${escapeHtml(room?room.name:'?')}</span></div>
         <div class="info-line"><span class="k">${t('date')}</span><span class="v">${b.date}</span></div>
@@ -1031,6 +1172,7 @@ function openBookingDetail(bookingId){
       </div>
       <div class="modal-foot">
         <button class="btn ghost" id="closeDetail2">${t('close')}</button>
+        ${canCancel ? `<button class="btn ghost" id="editBookingBtn">${t('edit')}</button>` : ''}
         ${canCancel ? `<button class="btn danger" id="cancelBookingBtn">${t('cancelBooking')}</button>` : ''}
       </div>
     </div>
@@ -1038,8 +1180,38 @@ function openBookingDetail(bookingId){
   const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
   document.getElementById('closeDetail').onclick = close;
   document.getElementById('closeDetail2').onclick = close;
+  const editBtn = document.getElementById('editBookingBtn');
+  if(editBtn) editBtn.onclick = ()=> openEditBookingModal(b.id);
   const cancelBtn = document.getElementById('cancelBookingBtn');
-  if(cancelBtn) cancelBtn.onclick = ()=>{ showConfirm(t('cancelBooking')+'?', ()=>doCancel(b.id)); };
+  if(cancelBtn) cancelBtn.onclick = ()=>{
+    if(isSeries){
+      showSeriesCancelChoice(b);
+    } else {
+      showConfirm(t('cancelBooking')+'?', ()=>doCancel(b.id));
+    }
+  };
+}
+
+function showSeriesCancelChoice(b){
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="overlay" id="overlaySeries">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal-head"><h3>${t('cancelBooking')}</h3><button class="close-x" id="closeSeries">✕</button></div>
+      <div class="modal-body">
+        <div style="font-size:14px;line-height:1.5;">${t('seriesCancelPrompt')}</div>
+      </div>
+      <div class="modal-foot" style="flex-wrap:wrap;">
+        <button class="btn ghost" id="closeSeries2">${t('cancel')}</button>
+        <button class="btn ghost" id="cancelOneBtn">${t('cancelThisOnly')}</button>
+        <button class="btn danger" id="cancelSeriesBtn">${t('cancelSeries')}</button>
+      </div>
+    </div>
+  </div>`;
+  const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
+  document.getElementById('closeSeries').onclick = close;
+  document.getElementById('closeSeries2').onclick = close;
+  document.getElementById('cancelOneBtn').onclick = ()=> doCancel(b.id);
+  document.getElementById('cancelSeriesBtn').onclick = ()=> doCancelSeries(b.seriesId);
 }
 
 async function doCancel(bookingId){
@@ -1047,6 +1219,13 @@ async function doCancel(bookingId){
   document.getElementById('modalRoot').innerHTML='';
   render();
   deleteBookingDb(bookingId).then(ok=>{ if(ok) toast(t('cancelledOk')); });
+}
+
+async function doCancelSeries(seriesId){
+  state.bookings = state.bookings.filter(b=>b.seriesId!==seriesId);
+  document.getElementById('modalRoot').innerHTML='';
+  render();
+  deleteSeriesDb(seriesId).then(ok=>{ if(ok) toast(t('cancelledOk')); });
 }
 
 /* ---------------- Admin: Login / Setup ---------------- */
