@@ -57,7 +57,7 @@
   .nav-group .btn{border:none;background:transparent;padding:6px 10px;}
   .nav-group .btn.active{background:var(--amber);color:#181205;}
   .datepick{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--text);background:transparent;border:none;padding:0 6px;min-width:118px;text-align:center;color-scheme:dark;cursor:pointer;}
-  .datepick::-webkit-calendar-picker-indicator{filter:invert(0.8) sepia(1) saturate(3) hue-rotate(2deg);cursor:pointer;}
+  .datepick::-webkit-calendar-picker-indicator{cursor:pointer;opacity:1;}
 
   main{flex:1;padding:20px;max-width:1400px;margin:0 auto;width:100%;}
 
@@ -118,10 +118,18 @@
     width:100%;background:var(--panel-alt);border:1px solid var(--border);border-radius:var(--radius);
     padding:9px 10px;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;
   }
+  .field input[type=date],.field input[type=time]{color-scheme:dark;}
   .field .mono-input{font-family:'IBM Plex Mono',monospace;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .hint{font-size:11px;color:var(--text-dim);margin-top:4px;}
   .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+  .weekday-picker{display:flex;gap:6px;flex-wrap:wrap;}
+  .wd-btn{
+    width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--panel-alt);
+    color:var(--text-dim);font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .wd-btn:hover{border-color:var(--amber);color:var(--text);}
+  .wd-btn.active{background:var(--amber);border-color:var(--amber);color:#181205;}
 
   .info-line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px;}
   .info-line .k{color:var(--text-dim);}
@@ -222,7 +230,8 @@ const I18N = {
     free: "Frei", booked: "Belegt", yourBooking: "Deine Buchung",
     bookRoom: "Raum buchen", room: "Raum", date: "Datum", start: "Von", end: "Bis",
     name: "Name", company: "Firma", title: "Titel / Zweck", email: "E-Mail (optional)",
-    recurring: "Wöchentlich wiederholen", weeks: "Anzahl Wochen",
+    recurring: "Wiederholen", weeks: "Anzahl Wochen", onWeekdays: "An diesen Wochentagen",
+    wd0: "So", wd1: "Mo", wd2: "Di", wd3: "Mi", wd4: "Do", wd5: "Fr", wd6: "Sa",
     save: "Speichern", bookSubmit: "Buchen", cancel: "Abbrechen", close: "Schliessen",
     bookingDetails: "Buchungsdetails", cancelBooking: "Buchung stornieren",
     confirm: "Bestätigen",
@@ -254,7 +263,8 @@ const I18N = {
     free: "Free", booked: "Booked", yourBooking: "Your booking",
     bookRoom: "Book room", room: "Room", date: "Date", start: "Start", end: "End",
     name: "Name", company: "Company", title: "Title / purpose", email: "Email (optional)",
-    recurring: "Repeat weekly", weeks: "Number of weeks",
+    recurring: "Repeat", weeks: "Number of weeks", onWeekdays: "On these weekdays",
+    wd0: "Su", wd1: "Mo", wd2: "Tu", wd3: "We", wd4: "Th", wd5: "Fr", wd6: "Sa",
     save: "Save", bookSubmit: "Book", cancel: "Cancel", close: "Close",
     bookingDetails: "Booking details", cancelBooking: "Cancel booking",
     confirm: "Confirm",
@@ -286,7 +296,8 @@ const I18N = {
     free: "Libre", booked: "Réservé", yourBooking: "Votre réservation",
     bookRoom: "Réserver la salle", room: "Salle", date: "Date", start: "Début", end: "Fin",
     name: "Nom", company: "Entreprise", title: "Titre / objet", email: "E-mail (facultatif)",
-    recurring: "Répéter chaque semaine", weeks: "Nombre de semaines",
+    recurring: "Répéter", weeks: "Nombre de semaines", onWeekdays: "Ces jours de la semaine",
+    wd0: "Di", wd1: "Lu", wd2: "Ma", wd3: "Me", wd4: "Je", wd5: "Ve", wd6: "Sa",
     save: "Enregistrer", bookSubmit: "Réserver", cancel: "Annuler", close: "Fermer",
     bookingDetails: "Détails de la réservation", cancelBooking: "Annuler la réservation",
     confirm: "Confirmer",
@@ -314,7 +325,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -837,9 +848,15 @@ function openBookingModal(roomId, dateStr, startMin){
             <label style="margin:0;text-transform:none;font-size:13px;color:var(--text);" for="bRecurring">${t('recurring')}</label>
           </div>
         </div>
+        <div class="field" id="weekdaysField" style="display:none;">
+          <label>${t('onWeekdays')}</label>
+          <div class="weekday-picker">
+            ${[1,2,3,4,5,6,0].map(d=>`<button type="button" class="wd-btn" data-day="${d}">${t('wd'+d)}</button>`).join('')}
+          </div>
+        </div>
         <div class="field" id="weeksField" style="display:none;">
           <label>${t('weeks')}</label>
-          <input type="number" id="bWeeks" min="2" max="26" value="4">
+          <input type="number" id="bWeeks" min="1" max="26" value="4">
         </div>` : ''}
       </div>
       <div class="modal-foot">
@@ -851,7 +868,17 @@ function openBookingModal(roomId, dateStr, startMin){
   document.getElementById('modalRoot').innerHTML = html;
 
   const rec = document.getElementById('bRecurring');
-  if(rec) rec.onchange = ()=>{ document.getElementById('weeksField').style.display = rec.checked?'block':'none'; };
+  if(rec) rec.onchange = ()=>{
+    const show = rec.checked ? 'block' : 'none';
+    document.getElementById('weekdaysField').style.display = show;
+    document.getElementById('weeksField').style.display = show;
+  };
+  // default-select the weekday of the initially chosen date
+  const startWeekday = parseDate(dateStr).getDay();
+  document.querySelectorAll('.wd-btn').forEach(btn=>{
+    if(parseInt(btn.getAttribute('data-day'))===startWeekday) btn.classList.add('active');
+    btn.onclick = ()=> btn.classList.toggle('active');
+  });
 
   document.getElementById('closeModal').onclick = closeModal;
   document.getElementById('cancelModal').onclick = closeModal;
@@ -914,8 +941,16 @@ async function submitBooking(roomId){
 
   const datesToBook = [date];
   if(recurring){
-    let d = parseDate(date);
-    for(let i=1;i<weeks;i++){ d = addDays(d,7); datesToBook.push(fmtDate(d)); }
+    const selectedDays = Array.from(document.querySelectorAll('.wd-btn.active')).map(b=>parseInt(b.getAttribute('data-day')));
+    const days = selectedDays.length ? selectedDays : [parseDate(date).getDay()];
+    const startD = parseDate(date);
+    const totalDays = weeks * 7;
+    datesToBook.length = 0;
+    for(let i=0; i<totalDays; i++){
+      const d = addDays(startD, i);
+      if(days.includes(d.getDay())) datesToBook.push(fmtDate(d));
+    }
+    if(!datesToBook.length) datesToBook.push(date);
   }
 
   const buf = s.bufferMinutes||0;
