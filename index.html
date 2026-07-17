@@ -181,6 +181,12 @@
     background:var(--panel-alt);border:1px dashed var(--amber);color:var(--amber);
     padding:12px;border-radius:6px;text-align:center;margin:10px 0;
   }
+  .help-content h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin:20px 0 8px;}
+  .help-content h4:first-child{margin-top:0;}
+  .help-content p{margin:0 0 8px;font-size:13.5px;line-height:1.55;color:var(--text);}
+  .help-content ul{margin:0 0 8px;padding-left:20px;}
+  .help-content li{font-size:13.5px;line-height:1.6;color:var(--text);margin-bottom:4px;}
+  .help-content .lock{color:var(--amber);}
 </style>
 </head>
 <body>
@@ -228,6 +234,7 @@ const I18N = {
     appTitle: "ELO Raumplan", appSub: "",
     day: "Tag", week: "Woche", today: "Heute", qrcodes: "QR-Codes", admin: "Admin", logout: "Abmelden",
     free: "Frei", booked: "Belegt", yourBooking: "Deine Buchung",
+    legendHint: "Leeres Zeitfenster antippen zum Buchen. Farbige Blöcke = bereits belegt (Farbe entspricht dem Raum).",
     bookRoom: "Raum buchen", room: "Raum", date: "Datum", start: "Von", end: "Bis",
     name: "Name", company: "Firma", title: "Titel / Zweck", email: "E-Mail (optional)",
     recurring: "Wiederholen", weeks: "Anzahl Wochen", onWeekdays: "An diesen Wochentagen",
@@ -241,7 +248,7 @@ const I18N = {
     confirm: "Bestätigen",
     onlyCreatorHint: "Nur {name} (Ersteller/in) oder ein Admin kann diese Buchung stornieren.",
     onlyCreatorSettingHint: "Erkennung erfolgt über das Gerät/den Browser, mit dem gebucht wurde — kein Code nötig. Admins können immer stornieren.",
-    settings: "Einstellungen", rooms: "Räume", general: "Allgemein", booking: "Buchung", companiesLbl: "Firmen",
+    settings: "Einstellungen", rooms: "Räume", general: "Allgemein", booking: "Buchung", companiesLbl: "Firmen", help: "Hilfe",
     addRoom: "Raum hinzufügen", roomName: "Name", capacity: "Kapazität", equipment: "Ausstattung",
     active: "Aktiv", inactive: "Inaktiv", delete: "Löschen", edit: "Bearbeiten",
     interval: "Buchungsintervall (Min)", openingHours: "Öffnungszeiten", minDur: "Min. Dauer (Min)",
@@ -265,6 +272,7 @@ const I18N = {
     appTitle: "ELO Room Plan", appSub: "",
     day: "Day", week: "Week", today: "Today", qrcodes: "QR Codes", admin: "Admin", logout: "Log out",
     free: "Free", booked: "Booked", yourBooking: "Your booking",
+    legendHint: "Tap an empty time slot to book. Coloured blocks = already booked (colour matches the room).",
     bookRoom: "Book room", room: "Room", date: "Date", start: "Start", end: "End",
     name: "Name", company: "Company", title: "Title / purpose", email: "Email (optional)",
     recurring: "Repeat", weeks: "Number of weeks", onWeekdays: "On these weekdays",
@@ -278,7 +286,7 @@ const I18N = {
     confirm: "Confirm",
     onlyCreatorHint: "Only {name} (creator) or an admin can cancel this booking.",
     onlyCreatorSettingHint: "Recognised by the device/browser used to book — no code needed. Admins can always cancel.",
-    settings: "Settings", rooms: "Rooms", general: "General", booking: "Booking", companiesLbl: "Companies",
+    settings: "Settings", rooms: "Rooms", general: "General", booking: "Booking", companiesLbl: "Companies", help: "Help",
     addRoom: "Add room", roomName: "Name", capacity: "Capacity", equipment: "Equipment",
     active: "Active", inactive: "Inactive", delete: "Delete", edit: "Edit",
     interval: "Booking interval (min)", openingHours: "Opening hours", minDur: "Min. duration (min)",
@@ -302,6 +310,7 @@ const I18N = {
     appTitle: "ELO Plan des salles", appSub: "",
     day: "Jour", week: "Semaine", today: "Aujourd'hui", qrcodes: "Codes QR", admin: "Admin", logout: "Se déconnecter",
     free: "Libre", booked: "Réservé", yourBooking: "Votre réservation",
+    legendHint: "Touchez un créneau vide pour réserver. Blocs colorés = déjà réservé (la couleur correspond à la salle).",
     bookRoom: "Réserver la salle", room: "Salle", date: "Date", start: "Début", end: "Fin",
     name: "Nom", company: "Entreprise", title: "Titre / objet", email: "E-mail (facultatif)",
     recurring: "Répéter", weeks: "Nombre de semaines", onWeekdays: "Ces jours de la semaine",
@@ -315,7 +324,7 @@ const I18N = {
     confirm: "Confirmer",
     onlyCreatorHint: "Seul(e) {name} (créateur/trice) ou un administrateur peut annuler cette réservation.",
     onlyCreatorSettingHint: "Reconnaissance via l'appareil/navigateur utilisé pour réserver — aucun code nécessaire. Les administrateurs peuvent toujours annuler.",
-    settings: "Paramètres", rooms: "Salles", general: "Général", booking: "Réservation", companiesLbl: "Entreprises",
+    settings: "Paramètres", rooms: "Salles", general: "Général", booking: "Réservation", companiesLbl: "Entreprises", help: "Aide",
     addRoom: "Ajouter une salle", roomName: "Nom", capacity: "Capacité", equipment: "Équipement",
     active: "Active", inactive: "Inactive", delete: "Supprimer", edit: "Modifier",
     interval: "Intervalle de réservation (min)", openingHours: "Heures d'ouverture", minDur: "Durée min. (min)",
@@ -337,7 +346,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.9.2";
+const APP_VERSION = "1.10.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -598,6 +607,7 @@ function renderHeader(){
     ${state.isAdmin
       ? `<span class="lockbadge">🔓 ${t('admin')}</span><button class="btn small" data-act="admin-view">${t('settings')}</button><button class="btn small ghost" data-act="logout">${t('logout')}</button>`
       : `<button class="btn small ghost" data-act="admin-login">🔒 ${t('admin')}</button>`}
+    <button class="btn small ghost" data-act="help" title="${t('help')}">❓ ${t('help')}</button>
   </header>`;
 }
 
@@ -621,6 +631,8 @@ function attachHeaderEvents(){
   if(tdy) tdy.onclick = ()=>{ state.currentDate = new Date(); render(); };
   const adminBtn = h.querySelector('[data-act="admin-login"]');
   if(adminBtn) adminBtn.onclick = openAdminLogin;
+  const helpBtn = h.querySelector('[data-act="help"]');
+  if(helpBtn) helpBtn.onclick = openHelpModal;
   const adminView = h.querySelector('[data-act="admin-view"]');
   if(adminView) adminView.onclick = ()=>{ state.view='admin'; render(); };
   const logout = h.querySelector('[data-act="logout"]');
@@ -697,8 +709,7 @@ function renderDayView(){
 
   return `
     <div class="legend">
-      <span><span class="sw" style="background:rgba(62,207,142,.5)"></span>${t('free')} (klicken zum Buchen)</span>
-      <span><span class="sw" style="background:var(--amber)"></span>${t('booked')}</span>
+      <span>${t('legendHint')}</span>
     </div>
     <div class="board-wrap">
       <div class="board" style="--slot-h:${slotH}px;grid-template-columns:64px repeat(${rooms.length}, minmax(140px,1fr));">
@@ -1334,6 +1345,89 @@ async function doCancelSeries(seriesId){
 }
 
 /* ---------------- Admin: Login / Setup ---------------- */
+/* ---------------- Help ---------------- */
+const HELP_CONTENT = {
+  de: `
+    <h4>Raum buchen</h4>
+    <p>Auf einen freien (grünen) Zeitblock in der Tages- oder Wochenansicht klicken. Name eintragen, Firma wählen, speichern.</p>
+    <h4>Ansicht wechseln</h4>
+    <ul>
+      <li><b>Tag</b> zeigt alle Räume nebeneinander für einen Tag.</li>
+      <li><b>Woche</b> zeigt einen Raum über 7 Tage (Raum-Auswahl oben).</li>
+      <li>Auf das Datum oben tippen öffnet einen Kalender zum schnellen Springen.</li>
+    </ul>
+    <h4>Wiederkehrende Termine</h4>
+    <p>Beim Buchen "Wiederholen" aktivieren: Intervall (z.B. alle 2 Wochen), Wochentage und Gesamtdauer wählen — wie in Outlook.</p>
+    <h4>Bearbeiten &amp; Stornieren</h4>
+    <p>Auf eine bestehende Buchung klicken. Nur der/die Ersteller/in (auf demselben Gerät) oder ein Admin kann sie bearbeiten oder stornieren — je nach Einstellung. Beim Bearbeiten lässt sich auch der Raum wechseln.</p>
+    <p>Gehört der Termin zu einer Serie, fragt die App: nur diesen einen Termin ändern/stornieren, oder die ganze Serie.</p>
+    <h4>QR-Codes</h4>
+    <p>Im Tab "QR-Codes" gibt's für jeden Raum einen Code, der direkt zur Buchung dieses Raums führt — praktisch zum Ausdrucken für die Tür.</p>
+    <h4><span class="lock">🔒</span> Gesperrte Räume</h4>
+    <p>Manche Räume sind nur für bestimmte Firmen buchbar (Schloss-Symbol). Das wird beim Buchen automatisch geprüft.</p>
+    <h4>Admin-Bereich</h4>
+    <p>Über den Admin-Button (E-Mail + Passwort) lassen sich Räume, Einstellungen und Firmenliste verwalten, sowie beliebige Buchungen bearbeiten/stornieren.</p>
+  `,
+  en: `
+    <h4>Book a room</h4>
+    <p>Click a free (green) time slot in the day or week view. Enter your name, pick a company, save.</p>
+    <h4>Switch views</h4>
+    <ul>
+      <li><b>Day</b> shows all rooms side by side for one day.</li>
+      <li><b>Week</b> shows one room across 7 days (room picker at the top).</li>
+      <li>Tap the date at the top to open a calendar and jump quickly.</li>
+    </ul>
+    <h4>Recurring bookings</h4>
+    <p>Enable "Repeat" when booking: choose the interval (e.g. every 2 weeks), weekdays, and total duration — just like Outlook.</p>
+    <h4>Edit &amp; cancel</h4>
+    <p>Click an existing booking. Only the creator (on the same device) or an admin can edit or cancel it, depending on settings. You can also change the room while editing.</p>
+    <p>If the booking is part of a series, the app asks: change/cancel just this occurrence, or the whole series.</p>
+    <h4>QR codes</h4>
+    <p>The "QR Codes" tab has one code per room that links straight to booking that room — handy to print for the door.</p>
+    <h4><span class="lock">🔒</span> Restricted rooms</h4>
+    <p>Some rooms can only be booked by certain companies (lock icon). This is checked automatically when booking.</p>
+    <h4>Admin area</h4>
+    <p>The admin button (email + password) lets you manage rooms, settings and the company list, and edit/cancel any booking.</p>
+  `,
+  fr: `
+    <h4>Réserver une salle</h4>
+    <p>Cliquez sur un créneau libre (vert) dans la vue jour ou semaine. Indiquez votre nom, choisissez une entreprise, enregistrez.</p>
+    <h4>Changer de vue</h4>
+    <ul>
+      <li><b>Jour</b> affiche toutes les salles côte à côte pour une journée.</li>
+      <li><b>Semaine</b> affiche une salle sur 7 jours (sélecteur de salle en haut).</li>
+      <li>Touchez la date en haut pour ouvrir un calendrier et vous déplacer rapidement.</li>
+    </ul>
+    <h4>Réservations récurrentes</h4>
+    <p>Activez "Répéter" lors de la réservation : choisissez l'intervalle (p.ex. toutes les 2 semaines), les jours et la durée totale — comme dans Outlook.</p>
+    <h4>Modifier &amp; annuler</h4>
+    <p>Cliquez sur une réservation existante. Seul(e) le/la créateur/trice (sur le même appareil) ou un administrateur peut la modifier ou l'annuler, selon les paramètres. Vous pouvez aussi changer de salle en modifiant.</p>
+    <p>Si la réservation fait partie d'une série, l'application demande : modifier/annuler seulement cette occurrence, ou toute la série.</p>
+    <h4>Codes QR</h4>
+    <p>L'onglet "Codes QR" propose un code par salle menant directement à sa réservation — pratique à imprimer pour la porte.</p>
+    <h4><span class="lock">🔒</span> Salles restreintes</h4>
+    <p>Certaines salles ne sont réservables que par certaines entreprises (icône cadenas). C'est vérifié automatiquement lors de la réservation.</p>
+    <h4>Espace admin</h4>
+    <p>Le bouton admin (e-mail + mot de passe) permet de gérer les salles, les paramètres et la liste des entreprises, et de modifier/annuler n'importe quelle réservation.</p>
+  `
+};
+
+function openHelpModal(){
+  const content = HELP_CONTENT[state.uiLang] || HELP_CONTENT.de;
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="overlay" id="overlayHelp">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-head"><h3>❓ ${t('help')}</h3><button class="close-x" id="closeHelp">✕</button></div>
+      <div class="modal-body help-content">${content}</div>
+      <div class="modal-foot"><button class="btn primary" id="closeHelp2">${t('close')}</button></div>
+    </div>
+  </div>`;
+  const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
+  document.getElementById('closeHelp').onclick = close;
+  document.getElementById('closeHelp2').onclick = close;
+  document.getElementById('overlayHelp').onclick = (e)=>{ if(e.target.id==='overlayHelp') close(); };
+}
+
 function openAdminLogin(){
   document.getElementById('modalRoot').innerHTML = `
   <div class="overlay" id="overlayA">
