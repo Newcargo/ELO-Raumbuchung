@@ -346,7 +346,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.10.1";
+const APP_VERSION = "1.10.2";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -862,7 +862,7 @@ function attachQrEvents(){
     rooms.forEach(r=>{
       const el = document.getElementById(`qr-${r.id}`);
       if(el && window.QRCode){
-        const url = `${baseUrl}?room=${r.id}&date=${fmtDate(new Date())}`;
+        const url = `${baseUrl}?room=${r.id}`;
         new QRCode(el, { text: url, width: 140, height: 140, colorDark:"#12161d", colorLight:"#ffffff" });
       }
     });
