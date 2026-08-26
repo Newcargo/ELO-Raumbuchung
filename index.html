@@ -270,6 +270,10 @@ const I18N = {
     accessProtection: "Zugriffsschutz", accessCodeLabel: "Zugriffscode", accessCodePlaceholder: "z.B. buero2026",
     accessCodeEnable: "Zugriffscode aktivieren",
     accessCodeHint: "Der Code bleibt gespeichert, auch wenn deaktiviert — du kannst den Schutz jederzeit ohne erneute Eingabe wieder einschalten.",
+    gateCodeHint: "Den Zugriffscode findest du auf dem Aufkleber unterhalb des QR-Codes an der jeweiligen Raumtür. Diese Seite erscheint nur, wenn dein Gerät den Code noch nicht kennt — z.B. beim ersten Besuch oder nachdem der Browser-Speicher (Cache) gelöscht wurde. Einmal eingegeben, merkt sich dieses Gerät den Code automatisch für die Zukunft.",
+    gateWarningTitle: "Nur öffentliche Angaben eintragen",
+    gateWarningText: "In dieses Tool dürfen ausschliesslich unkritische, öffentliche Informationen eingetragen werden (z.B. Name, kurzer Meeting-Titel). Bitte KEINE vertraulichen, geheimen oder sensiblen Daten hinterlegen — keine Kundennamen, Projektdetails, Passwörter o.ä. Alle Einträge sind für jede Person mit Zugriff auf dieses Tool sichtbar.",
+    gateAckLabel: "Ich habe das gelesen und verstanden.",
     backupTitle: "Datensicherung", backupHint: "Lädt eine Momentaufnahme aller Räume, Buchungen und Einstellungen als Datei herunter. Empfehlung: regelmässig (z.B. wöchentlich) sichern.",
     downloadBackup: "Backup herunterladen", backupDownloaded: "Backup heruntergeladen.",
     restoreHint: "Im Ernstfall: Backup-Datei auswählen, um Räume, Buchungen und Einstellungen wiederherzustellen. Ersetzt ALLE aktuellen Daten unwiderruflich.",
@@ -279,6 +283,7 @@ const I18N = {
     noBookings: "Keine Buchungen für diesen Raum.", pickRoom: "Raum wählen",
     savedOk: "Gespeichert.", bookedOk: "Buchung erstellt.", cancelledOk: "Buchung storniert.",
     conflict: "Dieser Zeitraum ist bereits belegt.", durationInvalid: "Die Dauer entspricht nicht den Buchungsregeln.", outsideHours: "Diese Zeit liegt ausserhalb der Öffnungszeiten.", endBeforeStart: "Die Endzeit muss nach der Startzeit liegen. Prüfe bei 12-Stunden-Anzeige AM/PM (12:00 AM = Mitternacht, 12:00 PM = Mittag).",
+    conflictRace: "Dieser Zeitraum wurde soeben von jemand anderem gebucht. Bitte Ansicht aktualisieren und einen anderen Zeitraum wählen.",
     fillRequired: "Bitte alle Pflichtfelder ausfüllen.", scanHint: "Scannen für direkte Buchung dieses Raums",
     printAll: "Alle drucken", addCompany: "Firma hinzufügen", removeRoomConfirm: "Raum wirklich löschen? Bestehende Buchungen bleiben erhalten.",
     ruagOnly: "Nur für RUAG buchbar", ruagOnlyBadge: "RUAG intern", ruagOnlyHint: "Dieser Raum kann nur mit Firma \"RUAG\" gebucht werden.", ruagOnlyBlock: "Dieser Raum ist nur für RUAG-Mitarbeitende buchbar.",
@@ -317,6 +322,10 @@ const I18N = {
     accessProtection: "Access protection", accessCodeLabel: "Access code", accessCodePlaceholder: "e.g. office2026",
     accessCodeEnable: "Enable access code",
     accessCodeHint: "The code stays saved even when disabled — you can re-enable protection anytime without typing it again.",
+    gateCodeHint: "You'll find the access code on the sticker below the QR code on each room's door. This page only appears when your device doesn't know the code yet — e.g. on your first visit, or after your browser storage (cache) has been cleared. Once entered, this device will remember it automatically from then on.",
+    gateWarningTitle: "Only enter public information",
+    gateWarningText: "This tool is only for non-sensitive, public information (e.g. name, a short meeting title). Please do NOT enter confidential, secret or sensitive data — no customer names, project details, passwords, etc. Everything entered here is visible to anyone with access to this tool.",
+    gateAckLabel: "I have read and understood this.",
     backupTitle: "Backup", backupHint: "Downloads a snapshot of all rooms, bookings and settings as a file. Recommendation: back up regularly (e.g. weekly).",
     downloadBackup: "Download backup", backupDownloaded: "Backup downloaded.",
     restoreHint: "In an emergency: choose a backup file to restore rooms, bookings and settings. Replaces ALL current data permanently.",
@@ -326,6 +335,7 @@ const I18N = {
     noBookings: "No bookings for this room.", pickRoom: "Select room",
     savedOk: "Saved.", bookedOk: "Booking created.", cancelledOk: "Booking cancelled.",
     conflict: "This time slot is already booked.", durationInvalid: "The duration doesn't match the booking rules.", outsideHours: "This time is outside opening hours.", endBeforeStart: "End time must be after the start time. If your clock shows AM/PM, double-check it (12:00 AM = midnight, 12:00 PM = noon).",
+    conflictRace: "This time slot was just booked by someone else. Please refresh and pick a different time.",
     fillRequired: "Please fill in all required fields.", scanHint: "Scan to book this room directly",
     printAll: "Print all", addCompany: "Add company", removeRoomConfirm: "Really delete this room? Existing bookings are kept.",
     ruagOnly: "RUAG-only room", ruagOnlyBadge: "RUAG internal", ruagOnlyHint: "This room can only be booked with company \"RUAG\".", ruagOnlyBlock: "This room can only be booked by RUAG staff.",
@@ -364,6 +374,10 @@ const I18N = {
     accessProtection: "Protection d'accès", accessCodeLabel: "Code d'accès", accessCodePlaceholder: "p.ex. bureau2026",
     accessCodeEnable: "Activer le code d'accès",
     accessCodeHint: "Le code reste enregistré même s'il est désactivé — vous pouvez réactiver la protection à tout moment sans le ressaisir.",
+    gateCodeHint: "Vous trouverez le code d'accès sur l'autocollant sous le code QR, sur la porte de chaque salle. Cette page n'apparaît que si votre appareil ne connaît pas encore le code — par exemple lors de votre première visite, ou après que la mémoire du navigateur (cache) a été effacée. Une fois saisi, cet appareil le retiendra automatiquement.",
+    gateWarningTitle: "N'indiquez que des informations publiques",
+    gateWarningText: "Cet outil ne doit contenir que des informations non sensibles et publiques (p.ex. nom, court titre de réunion). Merci de NE PAS saisir de données confidentielles, secrètes ou sensibles — pas de noms de clients, détails de projets, mots de passe, etc. Tout ce qui est saisi ici est visible par toute personne ayant accès à cet outil.",
+    gateAckLabel: "J'ai lu et compris ceci.",
     backupTitle: "Sauvegarde", backupHint: "Télécharge un instantané de toutes les salles, réservations et paramètres sous forme de fichier. Recommandation : sauvegarder régulièrement (p.ex. chaque semaine).",
     downloadBackup: "Télécharger la sauvegarde", backupDownloaded: "Sauvegarde téléchargée.",
     restoreHint: "En cas d'urgence : choisissez un fichier de sauvegarde pour restaurer les salles, réservations et paramètres. Remplace DÉFINITIVEMENT toutes les données actuelles.",
@@ -373,6 +387,7 @@ const I18N = {
     noBookings: "Aucune réservation pour cette salle.", pickRoom: "Choisir une salle",
     savedOk: "Enregistré.", bookedOk: "Réservation créée.", cancelledOk: "Réservation annulée.",
     conflict: "Ce créneau est déjà réservé.", durationInvalid: "La durée ne respecte pas les règles de réservation.", outsideHours: "Cette heure est en dehors des heures d'ouverture.", endBeforeStart: "L'heure de fin doit être après l'heure de début. Vérifiez AM/PM si votre horloge l'affiche (12:00 AM = minuit, 12:00 PM = midi).",
+    conflictRace: "Ce créneau vient d'être réservé par quelqu'un d'autre. Merci d'actualiser et de choisir un autre horaire.",
     fillRequired: "Veuillez remplir tous les champs obligatoires.", scanHint: "Scanner pour réserver directement cette salle",
     printAll: "Tout imprimer", addCompany: "Ajouter une entreprise", removeRoomConfirm: "Vraiment supprimer cette salle ? Les réservations existantes sont conservées.",
     ruagOnly: "Salle réservée à RUAG", ruagOnlyBadge: "RUAG interne", ruagOnlyHint: "Cette salle ne peut être réservée qu'avec l'entreprise \"RUAG\".", ruagOnlyBlock: "Cette salle ne peut être réservée que par le personnel RUAG.",
@@ -381,7 +396,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.12.1";
+const APP_VERSION = "1.14.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -395,6 +410,7 @@ function fmtHuman(d, lang){
   return d.toLocaleDateString(localeForLang(lang), opts);
 }
 function timeToMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function hhmm(t){ return t ? String(t).slice(0,5) : t; }
 function minToTime(m){ return `${pad(Math.floor(m/60))}:${pad(m%60)}`; }
 
 /* ---------------- DB <-> app field mapping ---------------- */
@@ -517,6 +533,13 @@ async function deleteRoomDb(id){
     return false;
   }
 }
+function isOverlapError(e){
+  if(!e) return false;
+  const code = e.code || '';
+  const msg = (e.message || '').toLowerCase();
+  return code === '23P01' || msg.includes('exclu') || msg.includes('overlap');
+}
+
 async function insertBookings(bookings){
   try{
     const res = await withTimeout(sbClient.from('bookings').insert(bookings.map(mapBookingToDb)), 8000);
@@ -524,7 +547,7 @@ async function insertBookings(bookings){
     return true;
   }catch(e){
     console.error('insertBookings failed', e);
-    toast(t('saveFailed'), true);
+    toast(isOverlapError(e) ? t('conflictRace') : t('saveFailed'), true);
     return false;
   }
 }
@@ -579,7 +602,7 @@ async function updateBookingDb(id, changes){
     return true;
   }catch(e){
     console.error('updateBookingDb failed', e);
-    toast(t('saveFailed'), true);
+    toast(isOverlapError(e) ? t('conflictRace') : t('saveFailed'), true);
     return false;
   }
 }
@@ -590,7 +613,7 @@ async function updateSeriesDb(seriesId, changes){
     return true;
   }catch(e){
     console.error('updateSeriesDb failed', e);
-    toast(t('saveFailed'), true);
+    toast(isOverlapError(e) ? t('conflictRace') : t('saveFailed'), true);
     return false;
   }
 }
@@ -652,16 +675,38 @@ function needsAccessGate(){
 function renderAccessGate(){
   const app = document.getElementById('app');
   app.innerHTML = `
-    <div class="empty-state" style="padding-top:80px;">
-      <div style="max-width:320px;margin:0 auto;text-align:left;">
+    <div class="empty-state" style="padding-top:60px;padding-bottom:40px;">
+      <div style="max-width:380px;margin:0 auto;text-align:left;">
         <h1 class="mono" style="font-size:16px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;text-align:center;margin-bottom:20px;">${t('appTitle')}</h1>
-        <div class="field"><label>${t('accessCodeLabel')}</label><input type="password" id="gateInput" class="mono-input"></div>
-        <button class="btn primary" id="gateSubmit" style="width:100%;justify-content:center;">${t('confirm')}</button>
+
+        <p class="hint" style="font-size:13px;line-height:1.6;margin-bottom:20px;">${t('gateCodeHint')}</p>
+
+        <div style="background:rgba(225,82,65,.12);border:1px solid var(--red);border-radius:8px;padding:16px;margin-bottom:18px;">
+          <div style="color:var(--red);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">⚠️ ${t('gateWarningTitle')}</div>
+          <div style="font-size:13.5px;line-height:1.6;color:var(--text);">${t('gateWarningText')}</div>
+        </div>
+
+        <div class="checkbox-row" style="align-items:flex-start;margin-bottom:20px;">
+          <input type="checkbox" id="gateAck" style="margin-top:3px;">
+          <label style="margin:0;text-transform:none;font-size:13.5px;line-height:1.5;color:var(--text);" for="gateAck">${t('gateAckLabel')}</label>
+        </div>
+
+        <div class="field"><label>${t('accessCodeLabel')}</label><input type="password" id="gateInput" class="mono-input" disabled></div>
+        <button class="btn primary" id="gateSubmit" style="width:100%;justify-content:center;" disabled>${t('confirm')}</button>
       </div>
     </div>
   `;
+  const ack = document.getElementById('gateAck');
+  const gateInput = document.getElementById('gateInput');
+  const gateSubmit = document.getElementById('gateSubmit');
+  ack.onchange = ()=>{
+    gateInput.disabled = !ack.checked;
+    gateSubmit.disabled = !ack.checked;
+    if(ack.checked) gateInput.focus();
+  };
   const submit = ()=>{
-    const val = document.getElementById('gateInput').value;
+    if(!ack.checked) return;
+    const val = gateInput.value;
     if(val === state.settings.accessCode){
       try{ localStorage.setItem('site-access', val); }catch(e){}
       render();
@@ -669,8 +714,8 @@ function renderAccessGate(){
       toast(t('wrongPw'), true);
     }
   };
-  document.getElementById('gateSubmit').onclick = submit;
-  document.getElementById('gateInput').onkeydown = (e)=>{ if(e.key==='Enter') submit(); };
+  gateSubmit.onclick = submit;
+  gateInput.onkeydown = (e)=>{ if(e.key==='Enter') submit(); };
 }
 
 function renderHeader(){
@@ -796,7 +841,7 @@ function renderDayView(){
       const height = (timeToMin(b.endTime)-timeToMin(b.startTime))/state.settings.bookingIntervalMinutes*slotH;
       return `<div class="booking-block" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-4)}px;background:${r.color}33;border-color:${r.color};">
         <div class="bt">${escapeHtml(b.title||b.name)}</div>
-        <div class="bc">${b.startTime}–${b.endTime} · ${escapeHtml(b.company||'')}</div>
+        <div class="bc">${hhmm(b.startTime)}–${hhmm(b.endTime)} · ${escapeHtml(b.company||'')}</div>
       </div>`;
     }).join('');
     const slotDivs = slots.map(m=>`<div class="slot" data-room="${r.id}" data-min="${m}"></div>`).join('');
@@ -874,7 +919,7 @@ function renderWeekView(){
       const height = (timeToMin(b.endTime)-timeToMin(b.startTime))/state.settings.bookingIntervalMinutes*slotH;
       return `<div class="booking-block" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-3)}px;background:${room.color}33;border-color:${room.color};">
         <div class="bt" style="font-size:10.5px;">${escapeHtml(b.title||b.name)}</div>
-        <div class="bc" style="font-size:9px;">${b.startTime}–${b.endTime}</div>
+        <div class="bc" style="font-size:9px;">${hhmm(b.startTime)}–${hhmm(b.endTime)}</div>
       </div>`;
     }).join('');
     const slotDivs = slots.map(m=>`<div class="slot" style="height:${slotH}px;" data-room="${room.id}" data-date="${dateStr}" data-min="${m}"></div>`).join('');
@@ -1175,7 +1220,17 @@ async function submitBooking(roomId){
   state.weekRoomId = roomId;
   closeModal();
   render();
-  insertBookings(newBookings).then(ok=>{ if(ok) toast(t('bookedOk')); });
+  insertBookings(newBookings).then(ok=>{
+    if(ok){
+      toast(t('bookedOk'));
+    } else {
+      const newIds = new Set(newBookings.map(b=>b.id));
+      state.bookings = state.bookings.filter(b=>!newIds.has(b.id));
+      state.myBookings = state.myBookings.filter(id=>!newIds.has(id));
+      try{ localStorage.setItem('my-bookings', JSON.stringify(state.myBookings)); }catch(e){}
+      render();
+    }
+  });
   try{ localStorage.setItem('my-bookings', JSON.stringify(state.myBookings)); }catch(e){}
 }
 
@@ -1210,8 +1265,8 @@ function openEditBookingModal(bookingId){
           <div class="field"></div>
         </div>
         <div class="row2">
-          <div class="field"><label>${t('start')}</label><input type="time" id="eStart" class="mono-input" value="${b.startTime}" step="${s.bookingIntervalMinutes*60}" lang="de-CH"></div>
-          <div class="field"><label>${t('end')}</label><input type="time" id="eEnd" class="mono-input" value="${b.endTime}" step="${s.bookingIntervalMinutes*60}" lang="de-CH"></div>
+          <div class="field"><label>${t('start')}</label><input type="time" id="eStart" class="mono-input" value="${hhmm(b.startTime)}" step="${s.bookingIntervalMinutes*60}" lang="de-CH"></div>
+          <div class="field"><label>${t('end')}</label><input type="time" id="eEnd" class="mono-input" value="${hhmm(b.endTime)}" step="${s.bookingIntervalMinutes*60}" lang="de-CH"></div>
         </div>
         <div class="hint">${t('interval')}: ${s.bookingIntervalMinutes} min · ${t('minDur')}: ${s.minDurationMinutes} · ${t('maxDur')}: ${s.maxDurationMinutes}</div>
         <div class="field" style="margin-top:14px;"><label>${t('name')} *</label><input type="text" id="eName" value="${escapeHtml(b.name)}"></div>
@@ -1326,13 +1381,17 @@ function applyEditToOne(b, changes){
   });
   if(conflict){ toast(`${t('conflict')} (${changes.date})`, true); return; }
 
+  const previous = { roomId:b.roomId, date:b.date, startTime:b.startTime, endTime:b.endTime, name:b.name, company:b.company, title:b.title, email:b.email };
   Object.assign(b, changes);
   document.getElementById('modalRoot').innerHTML='';
   render();
   updateBookingDb(b.id, {
     room_id: changes.roomId, date: changes.date, start_time: changes.startTime, end_time: changes.endTime,
     name: changes.name, company: changes.company, title: changes.title, email: changes.email
-  }).then(ok=>{ if(ok) toast(t('savedOk')); });
+  }).then(ok=>{
+    if(ok){ toast(t('savedOk')); }
+    else { Object.assign(b, previous); render(); }
+  });
 }
 
 function applyEditToSeries(b, changes){
@@ -1350,6 +1409,7 @@ function applyEditToSeries(b, changes){
     if(conflict){ toast(`${t('conflict')} (${member.date})`, true); return; }
   }
 
+  const previousStates = seriesMembers.map(member=>({ member, prev: { roomId:member.roomId, startTime:member.startTime, endTime:member.endTime, name:member.name, company:member.company, title:member.title, email:member.email } }));
   seriesMembers.forEach(member=>{
     Object.assign(member, { roomId:changes.roomId, startTime:changes.startTime, endTime:changes.endTime,
       name:changes.name, company:changes.company, title:changes.title, email:changes.email });
@@ -1359,7 +1419,10 @@ function applyEditToSeries(b, changes){
   updateSeriesDb(b.seriesId, {
     room_id: changes.roomId, start_time: changes.startTime, end_time: changes.endTime,
     name: changes.name, company: changes.company, title: changes.title, email: changes.email
-  }).then(ok=>{ if(ok) toast(t('savedOk')); });
+  }).then(ok=>{
+    if(ok){ toast(t('savedOk')); }
+    else { previousStates.forEach(({member,prev})=>Object.assign(member, prev)); render(); }
+  });
 }
 
 /* ---------------- Booking Detail / Cancel ---------------- */
@@ -1376,7 +1439,7 @@ function openBookingDetail(bookingId){
       <div class="modal-body">
         <div class="info-line"><span class="k">${t('room')}</span><span class="v" style="color:${room?room.color:''}">${escapeHtml(room?room.name:'?')}</span></div>
         <div class="info-line"><span class="k">${t('date')}</span><span class="v">${b.date}</span></div>
-        <div class="info-line"><span class="k">${t('start')}–${t('end')}</span><span class="v">${b.startTime}–${b.endTime}</span></div>
+        <div class="info-line"><span class="k">${t('start')}–${t('end')}</span><span class="v">${hhmm(b.startTime)}–${hhmm(b.endTime)}</span></div>
         <div class="info-line"><span class="k">${t('name')}</span><span class="v">${escapeHtml(b.name)}</span></div>
         <div class="info-line"><span class="k">${t('company')}</span><span class="v">${escapeHtml(b.company||'—')}</span></div>
         <div class="info-line"><span class="k">${t('title')}</span><span class="v">${escapeHtml(b.title||'—')}</span></div>
