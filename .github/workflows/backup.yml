@@ -1,0 +1,37 @@
+name: Nightly Supabase Backup
+
+on:
+  schedule:
+    # 02:00 UTC ≈ 03:00 Swiss time (CET, winter) / 04:00 (CEST, summer — GitHub
+    # cron does not adjust for daylight saving, so this drifts by 1h in summer)
+    - cron: '0 2 * * *'
+  workflow_dispatch: {}   # lets you also trigger a backup manually from the Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run backup script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: node scripts/backup.js
+
+      - name: Keep only the last 60 backups
+        run: |
+          cd backups
+          ls -1t backup-*.json | tail -n +61 | xargs -r rm --
+          cd ..
+
+      - name: Commit and push backup
+        run: |
+          git config user.name "backup-bot"
+          git config user.email "backup-bot@users.noreply.github.com"
+          git add backups/
+          git diff --quiet --cached || git commit -m "Automated backup $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
