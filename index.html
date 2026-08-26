@@ -227,6 +227,8 @@ const DEFAULT_SETTINGS = {
   requireEmail: false,
   allowRecurring: true,
   onlyCreatorCanCancel: true,
+  accessCode: "",
+  accessCodeEnabled: false,
 };
 
 const DEFAULT_ROOMS = [
@@ -265,6 +267,15 @@ const I18N = {
     changePw: "Admin-Passwort ändern", newPw: "Neues Passwort", currentPw: "Aktuelles Passwort",
     loginTitle: "Admin-Anmeldung", password: "Passwort", login: "Anmelden", wrongPw: "Falsches Passwort",
     dangerZone: "Gefahrenzone", deleteAll: "Alle Buchungen löschen", deleteAllConfirm: "Wirklich ALLE Buchungen unwiderruflich löschen?",
+    accessProtection: "Zugriffsschutz", accessCodeLabel: "Zugriffscode", accessCodePlaceholder: "z.B. buero2026",
+    accessCodeEnable: "Zugriffscode aktivieren",
+    accessCodeHint: "Der Code bleibt gespeichert, auch wenn deaktiviert — du kannst den Schutz jederzeit ohne erneute Eingabe wieder einschalten.",
+    backupTitle: "Datensicherung", backupHint: "Lädt eine Momentaufnahme aller Räume, Buchungen und Einstellungen als Datei herunter. Empfehlung: regelmässig (z.B. wöchentlich) sichern.",
+    downloadBackup: "Backup herunterladen", backupDownloaded: "Backup heruntergeladen.",
+    restoreHint: "Im Ernstfall: Backup-Datei auswählen, um Räume, Buchungen und Einstellungen wiederherzustellen. Ersetzt ALLE aktuellen Daten unwiderruflich.",
+    restoreBackup: "Backup wiederherstellen", restoreConfirm: "Wirklich wiederherstellen? Alle aktuellen Räume, Buchungen und Einstellungen werden durch den Inhalt der Backup-Datei ersetzt — das kann nicht rückgängig gemacht werden.",
+    restoreDone: "Wiederherstellung abgeschlossen.", restoreInvalid: "Diese Datei ist kein gültiges Backup.", restorePartial: "Wiederherstellung teilweise fehlgeschlagen — bitte prüfen und ggf. erneut versuchen.",
+    howItWorks: "So funktioniert's",
     noBookings: "Keine Buchungen für diesen Raum.", pickRoom: "Raum wählen",
     savedOk: "Gespeichert.", bookedOk: "Buchung erstellt.", cancelledOk: "Buchung storniert.",
     conflict: "Dieser Zeitraum ist bereits belegt.", durationInvalid: "Die Dauer entspricht nicht den Buchungsregeln.", outsideHours: "Diese Zeit liegt ausserhalb der Öffnungszeiten.", endBeforeStart: "Die Endzeit muss nach der Startzeit liegen. Prüfe bei 12-Stunden-Anzeige AM/PM (12:00 AM = Mitternacht, 12:00 PM = Mittag).",
@@ -303,6 +314,15 @@ const I18N = {
     changePw: "Change admin password", newPw: "New password", currentPw: "Current password",
     loginTitle: "Admin login", password: "Password", login: "Log in", wrongPw: "Wrong password",
     dangerZone: "Danger zone", deleteAll: "Delete all bookings", deleteAllConfirm: "Really delete ALL bookings permanently?",
+    accessProtection: "Access protection", accessCodeLabel: "Access code", accessCodePlaceholder: "e.g. office2026",
+    accessCodeEnable: "Enable access code",
+    accessCodeHint: "The code stays saved even when disabled — you can re-enable protection anytime without typing it again.",
+    backupTitle: "Backup", backupHint: "Downloads a snapshot of all rooms, bookings and settings as a file. Recommendation: back up regularly (e.g. weekly).",
+    downloadBackup: "Download backup", backupDownloaded: "Backup downloaded.",
+    restoreHint: "In an emergency: choose a backup file to restore rooms, bookings and settings. Replaces ALL current data permanently.",
+    restoreBackup: "Restore backup", restoreConfirm: "Really restore? All current rooms, bookings and settings will be replaced with the backup file's contents — this cannot be undone.",
+    restoreDone: "Restore complete.", restoreInvalid: "This file is not a valid backup.", restorePartial: "Restore partially failed — please check and try again if needed.",
+    howItWorks: "How it works",
     noBookings: "No bookings for this room.", pickRoom: "Select room",
     savedOk: "Saved.", bookedOk: "Booking created.", cancelledOk: "Booking cancelled.",
     conflict: "This time slot is already booked.", durationInvalid: "The duration doesn't match the booking rules.", outsideHours: "This time is outside opening hours.", endBeforeStart: "End time must be after the start time. If your clock shows AM/PM, double-check it (12:00 AM = midnight, 12:00 PM = noon).",
@@ -341,6 +361,15 @@ const I18N = {
     changePw: "Changer le mot de passe admin", newPw: "Nouveau mot de passe", currentPw: "Mot de passe actuel",
     loginTitle: "Connexion admin", password: "Mot de passe", login: "Se connecter", wrongPw: "Mot de passe incorrect",
     dangerZone: "Zone à risque", deleteAll: "Supprimer toutes les réservations", deleteAllConfirm: "Vraiment supprimer TOUTES les réservations définitivement ?",
+    accessProtection: "Protection d'accès", accessCodeLabel: "Code d'accès", accessCodePlaceholder: "p.ex. bureau2026",
+    accessCodeEnable: "Activer le code d'accès",
+    accessCodeHint: "Le code reste enregistré même s'il est désactivé — vous pouvez réactiver la protection à tout moment sans le ressaisir.",
+    backupTitle: "Sauvegarde", backupHint: "Télécharge un instantané de toutes les salles, réservations et paramètres sous forme de fichier. Recommandation : sauvegarder régulièrement (p.ex. chaque semaine).",
+    downloadBackup: "Télécharger la sauvegarde", backupDownloaded: "Sauvegarde téléchargée.",
+    restoreHint: "En cas d'urgence : choisissez un fichier de sauvegarde pour restaurer les salles, réservations et paramètres. Remplace DÉFINITIVEMENT toutes les données actuelles.",
+    restoreBackup: "Restaurer une sauvegarde", restoreConfirm: "Vraiment restaurer ? Toutes les salles, réservations et paramètres actuels seront remplacés par le contenu du fichier de sauvegarde — action irréversible.",
+    restoreDone: "Restauration terminée.", restoreInvalid: "Ce fichier n'est pas une sauvegarde valide.", restorePartial: "La restauration a partiellement échoué — veuillez vérifier et réessayer si nécessaire.",
+    howItWorks: "Comment ça marche",
     noBookings: "Aucune réservation pour cette salle.", pickRoom: "Choisir une salle",
     savedOk: "Enregistré.", bookedOk: "Réservation créée.", cancelledOk: "Réservation annulée.",
     conflict: "Ce créneau est déjà réservé.", durationInvalid: "La durée ne respecte pas les règles de réservation.", outsideHours: "Cette heure est en dehors des heures d'ouverture.", endBeforeStart: "L'heure de fin doit être après l'heure de début. Vérifiez AM/PM si votre horloge l'affiche (12:00 AM = minuit, 12:00 PM = midi).",
@@ -352,7 +381,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.10.3";
+const APP_VERSION = "1.12.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -521,6 +550,28 @@ async function deleteAllBookingsDb(){
     return false;
   }
 }
+async function deleteAllRoomsDb(){
+  try{
+    const res = await withTimeout(sbClient.from('rooms').delete().neq('id','__never_matches__'), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('deleteAllRoomsDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
+async function insertRoomsDb(rooms){
+  try{
+    const res = await withTimeout(sbClient.from('rooms').insert(rooms.map(mapRoomToDb)), 8000);
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    console.error('insertRoomsDb failed', e);
+    toast(t('saveFailed'), true);
+    return false;
+  }
+}
 async function updateBookingDb(id, changes){
   try{
     const res = await withTimeout(sbClient.from('bookings').update(changes).eq('id', id), 8000);
@@ -575,12 +626,51 @@ function render(){
   const app = document.getElementById('app');
   if(state.loading){ app.innerHTML = `<div class="empty-state">Laden…</div>`; return; }
 
+  if(needsAccessGate()){
+    renderAccessGate();
+    return;
+  }
+
   app.innerHTML = `
     ${renderHeader()}
     <main>${renderMain()}</main>
   `;
   attachHeaderEvents();
   attachMainEvents();
+}
+
+function needsAccessGate(){
+  if(state.isAdmin) return false;
+  if(!state.settings.accessCodeEnabled) return false;
+  const code = (state.settings.accessCode||'').trim();
+  if(!code) return false;
+  let unlocked = null;
+  try{ unlocked = localStorage.getItem('site-access'); }catch(e){}
+  return unlocked !== code;
+}
+
+function renderAccessGate(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="empty-state" style="padding-top:80px;">
+      <div style="max-width:320px;margin:0 auto;text-align:left;">
+        <h1 class="mono" style="font-size:16px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;text-align:center;margin-bottom:20px;">${t('appTitle')}</h1>
+        <div class="field"><label>${t('accessCodeLabel')}</label><input type="password" id="gateInput" class="mono-input"></div>
+        <button class="btn primary" id="gateSubmit" style="width:100%;justify-content:center;">${t('confirm')}</button>
+      </div>
+    </div>
+  `;
+  const submit = ()=>{
+    const val = document.getElementById('gateInput').value;
+    if(val === state.settings.accessCode){
+      try{ localStorage.setItem('site-access', val); }catch(e){}
+      render();
+    } else {
+      toast(t('wrongPw'), true);
+    }
+  };
+  document.getElementById('gateSubmit').onclick = submit;
+  document.getElementById('gateInput').onkeydown = (e)=>{ if(e.key==='Enter') submit(); };
 }
 
 function renderHeader(){
@@ -1418,6 +1508,55 @@ const HELP_CONTENT = {
   `
 };
 
+const RESTORE_INFO_CONTENT = {
+  de: `
+    <p>Falls ihr das automatische GitHub-Backup eingerichtet habt (nächtlich, letzte 60 Versionen im Ordner <code>backups/</code> im Repo) — die App holt sich diese Dateien <b>nicht selbst</b> von GitHub. So läuft die Wiederherstellung tatsächlich ab:</p>
+    <ol style="padding-left:20px;margin:10px 0;">
+      <li>Im GitHub-Repo in den Ordner <code>backups/</code> gehen</li>
+      <li>Die gewünschte Datei anklicken (z.B. die neueste, oder eine von vor dem Problem)</li>
+      <li>Auf den Download-Button klicken (rohe Datei herunterladen)</li>
+      <li>Erst <b>dann</b> hier in der App: "Backup wiederherstellen" → genau diese heruntergeladene Datei auswählen → bestätigen</li>
+    </ol>
+    <p>Alternativ funktioniert auch jede Datei, die über den "Backup herunterladen"-Button hier in der App selbst erzeugt wurde — beide Formate sind identisch.</p>
+  `,
+  en: `
+    <p>If you've set up the automatic GitHub backup (nightly, last 60 versions in the <code>backups/</code> folder in the repo) — the app does <b>not</b> fetch these files from GitHub itself. Here's how restoring actually works:</p>
+    <ol style="padding-left:20px;margin:10px 0;">
+      <li>Go to the <code>backups/</code> folder in the GitHub repo</li>
+      <li>Click the file you want (e.g. the latest one, or one from before the problem)</li>
+      <li>Click the download button (download the raw file)</li>
+      <li>Only <b>then</b>, here in the app: "Restore backup" → select that downloaded file → confirm</li>
+    </ol>
+    <p>Any file produced by the "Download backup" button here in the app also works — both formats are identical.</p>
+  `,
+  fr: `
+    <p>Si vous avez mis en place la sauvegarde automatique GitHub (chaque nuit, les 60 dernières versions dans le dossier <code>backups/</code> du dépôt) — l'application ne récupère <b>pas</b> ces fichiers elle-même depuis GitHub. Voici comment la restauration fonctionne réellement :</p>
+    <ol style="padding-left:20px;margin:10px 0;">
+      <li>Allez dans le dossier <code>backups/</code> du dépôt GitHub</li>
+      <li>Cliquez sur le fichier souhaité (p.ex. le plus récent, ou un datant d'avant le problème)</li>
+      <li>Cliquez sur le bouton de téléchargement (télécharger le fichier brut)</li>
+      <li>Seulement <b>ensuite</b>, ici dans l'application : "Restaurer une sauvegarde" → sélectionnez ce fichier téléchargé → confirmez</li>
+    </ol>
+    <p>Tout fichier produit par le bouton "Télécharger la sauvegarde" ici dans l'application fonctionne aussi — les deux formats sont identiques.</p>
+  `
+};
+
+function openRestoreInfoModal(){
+  const content = RESTORE_INFO_CONTENT[state.uiLang] || RESTORE_INFO_CONTENT.de;
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="overlay" id="overlayRestoreInfo">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-head"><h3>${t('howItWorks')}</h3><button class="close-x" id="closeRestoreInfo">✕</button></div>
+      <div class="modal-body help-content">${content}</div>
+      <div class="modal-foot"><button class="btn primary" id="closeRestoreInfo2">${t('close')}</button></div>
+    </div>
+  </div>`;
+  const close = ()=>{ document.getElementById('modalRoot').innerHTML=''; };
+  document.getElementById('closeRestoreInfo').onclick = close;
+  document.getElementById('closeRestoreInfo2').onclick = close;
+  document.getElementById('overlayRestoreInfo').onclick = (e)=>{ if(e.target.id==='overlayRestoreInfo') close(); };
+}
+
 function openHelpModal(){
   const content = HELP_CONTENT[state.uiLang] || HELP_CONTENT.de;
   document.getElementById('modalRoot').innerHTML = `
@@ -1560,6 +1699,22 @@ function renderAdminGeneral(){
       <div class="field"><label>${t('defaultView')}</label><select id="setDefView">${viewOpts}</select></div>
       <div class="field"><div class="checkbox-row"><input type="checkbox" id="setWeekends" ${s.allowWeekends?'checked':''}><label style="margin:0;text-transform:none;color:var(--text);" for="setWeekends">${t('weekends')}</label></div></div>
     </div>
+    <div class="section-title">${t('accessProtection')}</div>
+    <div class="field" style="max-width:360px;">
+      <div class="checkbox-row"><input type="checkbox" id="setAccessEnabled" ${s.accessCodeEnabled?'checked':''}><label style="margin:0;text-transform:none;color:var(--text);" for="setAccessEnabled">${t('accessCodeEnable')}</label></div>
+      <label style="margin-top:14px;">${t('accessCodeLabel')}</label>
+      <input type="text" id="setAccessCode" class="mono-input" value="${escapeHtml(s.accessCode||'')}" placeholder="${t('accessCodePlaceholder')}">
+      <div class="hint">${t('accessCodeHint')}</div>
+    </div>
+    <div class="section-title">${t('backupTitle')}</div>
+    <p class="hint" style="margin-bottom:10px;">${t('backupHint')}</p>
+    <button class="btn" id="downloadBackupBtn">⬇ ${t('downloadBackup')}</button>
+    <div style="margin-top:22px;">
+      <p class="hint" style="margin-bottom:10px;">${t('restoreHint')}</p>
+      <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+      <button class="btn danger" id="restoreBackupBtn">⬆ ${t('restoreBackup')}</button>
+      <button class="btn ghost small" id="restoreInfoBtn" title="${t('howItWorks')}" style="border-radius:50%;padding:5px 10px;">ⓘ</button>
+    </div>
     <div class="section-title">${t('dangerZone')}</div>
     <button class="btn danger" id="deleteAllBtn">🗑 ${t('deleteAll')}</button>
     <div style="margin-top:20px;"><button class="btn primary" id="saveGeneralBtn">${t('save')}</button></div>
@@ -1653,9 +1808,24 @@ function attachAdminEvents(){
     if(save) save.onclick = ()=>{
       state.settings.defaultView = document.getElementById('setDefView').value;
       state.settings.allowWeekends = document.getElementById('setWeekends').checked;
+      state.settings.accessCode = document.getElementById('setAccessCode').value.trim();
+      state.settings.accessCodeEnabled = document.getElementById('setAccessEnabled').checked;
       render();
       saveSettings().then(ok=>{ if(ok) toast(t('savedOk')); });
     };
+    const backupBtn = document.getElementById('downloadBackupBtn');
+    if(backupBtn) backupBtn.onclick = downloadBackup;
+    const restoreBtn = document.getElementById('restoreBackupBtn');
+    const restoreInput = document.getElementById('restoreFileInput');
+    if(restoreBtn && restoreInput){
+      restoreBtn.onclick = ()=>restoreInput.click();
+      restoreInput.onchange = ()=>{
+        if(restoreInput.files && restoreInput.files[0]) restoreFromBackupFile(restoreInput.files[0]);
+        restoreInput.value = '';
+      };
+    }
+    const restoreInfoBtn = document.getElementById('restoreInfoBtn');
+    if(restoreInfoBtn) restoreInfoBtn.onclick = openRestoreInfoModal;
   }
 
   if(state.adminTab==='booking'){
@@ -1742,6 +1912,59 @@ function openRoomForm(room){
     close(); render();
     upsertRoom(savedRoom).then(ok=>{ if(ok) toast(t('savedOk')); });
   };
+}
+
+function downloadBackup(){
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    appVersion: APP_VERSION,
+    rooms: state.rooms,
+    bookings: state.bookings,
+    settings: state.settings,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `elo-raumplan-backup-${fmtDate(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(t('backupDownloaded'));
+}
+
+function restoreFromBackupFile(file){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    let data;
+    try{ data = JSON.parse(reader.result); }catch(e){ toast(t('restoreInvalid'), true); return; }
+    if(!data || !Array.isArray(data.rooms) || !Array.isArray(data.bookings) || typeof data.settings !== 'object'){
+      toast(t('restoreInvalid'), true); return;
+    }
+    showConfirm(t('restoreConfirm'), ()=>doRestore(data));
+  };
+  reader.onerror = ()=>toast(t('restoreInvalid'), true);
+  reader.readAsText(file);
+}
+
+async function doRestore(data){
+  state.rooms = data.rooms;
+  state.bookings = data.bookings;
+  state.settings = { ...DEFAULT_SETTINGS, ...data.settings };
+  render();
+
+  const roomsCleared = await deleteAllRoomsDb();
+  const roomsRestored = roomsCleared && (!state.rooms.length || await insertRoomsDb(state.rooms));
+  const bookingsCleared = await deleteAllBookingsDb();
+  const bookingsRestored = bookingsCleared && (!state.bookings.length || await insertBookings(state.bookings));
+  const settingsSaved = await saveSettings();
+
+  if(roomsRestored && bookingsRestored && settingsSaved){
+    toast(t('restoreDone'));
+  } else {
+    toast(t('restorePartial'), true);
+  }
 }
 
 function escapeHtml(str){
