@@ -91,6 +91,10 @@
   }
   .booking-block .bt{font-weight:700;font-size:11.5px;line-height:1.25;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
   .booking-block .bc{font-size:10px;opacity:.85;font-family:'IBM Plex Mono',monospace;margin-top:1px;}
+  .booking-block.mine{
+    border-width:2px;box-shadow:0 0 0 1px var(--amber), 0 2px 8px rgba(242,184,76,.35);
+  }
+  .booking-block.mine .bt::before{content:"★ ";color:var(--amber);}
 
   .legend{display:flex;gap:18px;align-items:center;margin:12px 2px;font-size:12px;color:var(--text-dim);flex-wrap:wrap;}
   .legend .sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px;}
@@ -164,6 +168,19 @@
 
   /* ---- QR grid ---- */
   .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
+  .my-bookings-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+  .my-booking-item{
+    display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--border);
+    border-left:3px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:.15s;
+  }
+  .my-booking-item:hover{border-color:var(--amber);}
+  .mb-date{text-align:center;min-width:52px;font-family:'IBM Plex Mono',monospace;}
+  .mb-day{font-size:15px;font-weight:700;}
+  .mb-weekday{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
+  .mb-info{flex:1;min-width:0;}
+  .mb-room{font-weight:700;font-size:13.5px;letter-spacing:.03em;}
+  .mb-time{font-size:12px;color:var(--text-dim);margin-top:2px;}
+  .mb-title{font-size:12.5px;color:var(--text);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .qr-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;}
   .qr-card canvas,.qr-card img{margin:0 auto 10px;background:#fff;padding:8px;border-radius:6px;}
   .qr-card .qname{font-weight:800;letter-spacing:.05em;text-transform:uppercase;font-size:13px;}
@@ -241,8 +258,10 @@ const I18N = {
   de: {
     appTitle: "ELO Raumplan", appSub: "",
     day: "Tag", week: "Woche", today: "Heute", qrcodes: "QR-Codes", admin: "Admin", logout: "Abmelden",
+    myBookingsNav: "Meine", noMyBookings: "Du hast auf diesem Gerät noch keine Buchungen gemacht.",
+    upcoming: "Bevorstehend", pastBookings: "Vergangen",
     free: "Frei", booked: "Belegt", yourBooking: "Deine Buchung",
-    legendHint: "Leeres Zeitfenster antippen zum Buchen. Farbige Blöcke = bereits belegt (Farbe entspricht dem Raum).",
+    legendHint: "Leeres Zeitfenster antippen zum Buchen. Farbige Blöcke = bereits belegt (Farbe entspricht dem Raum). ★ = deine eigene Buchung.",
     bookRoom: "Raum buchen", room: "Raum", date: "Datum", start: "Von", end: "Bis",
     name: "Name", company: "Firma", title: "Titel / Zweck", email: "E-Mail (optional)",
     recurring: "Wiederholen", weeks: "Anzahl Wochen", onWeekdays: "An diesen Wochentagen",
@@ -293,8 +312,10 @@ const I18N = {
   en: {
     appTitle: "ELO Room Plan", appSub: "",
     day: "Day", week: "Week", today: "Today", qrcodes: "QR Codes", admin: "Admin", logout: "Log out",
+    myBookingsNav: "Mine", noMyBookings: "You haven't made any bookings on this device yet.",
+    upcoming: "Upcoming", pastBookings: "Past",
     free: "Free", booked: "Booked", yourBooking: "Your booking",
-    legendHint: "Tap an empty time slot to book. Coloured blocks = already booked (colour matches the room).",
+    legendHint: "Tap an empty time slot to book. Coloured blocks = already booked (colour matches the room). ★ = your own booking.",
     bookRoom: "Book room", room: "Room", date: "Date", start: "Start", end: "End",
     name: "Name", company: "Company", title: "Title / purpose", email: "Email (optional)",
     recurring: "Repeat", weeks: "Number of weeks", onWeekdays: "On these weekdays",
@@ -345,8 +366,10 @@ const I18N = {
   fr: {
     appTitle: "ELO Plan des salles", appSub: "",
     day: "Jour", week: "Semaine", today: "Aujourd'hui", qrcodes: "Codes QR", admin: "Admin", logout: "Se déconnecter",
+    myBookingsNav: "Mes réservations", noMyBookings: "Vous n'avez encore fait aucune réservation sur cet appareil.",
+    upcoming: "À venir", pastBookings: "Passées",
     free: "Libre", booked: "Réservé", yourBooking: "Votre réservation",
-    legendHint: "Touchez un créneau vide pour réserver. Blocs colorés = déjà réservé (la couleur correspond à la salle).",
+    legendHint: "Touchez un créneau vide pour réserver. Blocs colorés = déjà réservé (la couleur correspond à la salle). ★ = votre propre réservation.",
     bookRoom: "Réserver la salle", room: "Salle", date: "Date", start: "Début", end: "Fin",
     name: "Nom", company: "Entreprise", title: "Titre / objet", email: "E-mail (facultatif)",
     recurring: "Répéter", weeks: "Nombre de semaines", onWeekdays: "Ces jours de la semaine",
@@ -396,7 +419,7 @@ const I18N = {
   }
 };
 
-const APP_VERSION = "1.14.2";
+const APP_VERSION = "1.15.1";
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function t(key){ const v = (I18N[state.uiLang]||I18N.de)[key]; return v !== undefined ? v : key; }
@@ -736,9 +759,10 @@ function renderHeader(){
     <div class="nav-group">
       <button class="btn small ${state.view==='day'?'active':''}" data-act="view-day">${t('day')}</button>
       <button class="btn small ${state.view==='week'?'active':''}" data-act="view-week">${t('week')}</button>
+      <button class="btn small ${state.view==='mine'?'active':''}" data-act="view-mine">👤 ${t('myBookingsNav')}</button>
       <button class="btn small ${state.view==='qr'?'active':''}" data-act="view-qr">${t('qrcodes')}</button>
     </div>
-    ${state.view!=='qr' ? `
+    ${state.view!=='qr' && state.view!=='mine' ? `
     <div class="nav-group">
       <button class="btn small" data-act="prev">←</button>
       <input type="date" id="dateJump" class="datepick mono" value="${fmtDate(state.currentDate)}">
@@ -760,6 +784,8 @@ function attachHeaderEvents(){
   h.querySelector('[data-act="view-day"]').onclick = ()=>{ state.view='day'; render(); };
   h.querySelector('[data-act="view-week"]').onclick = ()=>{ state.view='week'; render(); };
   h.querySelector('[data-act="view-qr"]').onclick = ()=>{ state.view='qr'; render(); };
+  const mineBtn = h.querySelector('[data-act="view-mine"]');
+  if(mineBtn) mineBtn.onclick = ()=>{ state.view='mine'; render(); };
   const prev = h.querySelector('[data-act="prev"]');
   const next = h.querySelector('[data-act="next"]');
   const tdy = h.querySelector('[data-act="today"]');
@@ -786,6 +812,7 @@ function attachHeaderEvents(){
 function attachMainEvents(){
   if(state.view==='day') attachDayEvents();
   else if(state.view==='week') attachWeekEvents();
+  else if(state.view==='mine') attachMyBookingsEvents();
   else if(state.view==='qr') attachQrEvents();
   else if(state.view==='admin') attachAdminEvents();
 }
@@ -793,6 +820,7 @@ function attachMainEvents(){
 function renderMain(){
   if(state.view==='day') return renderDayView();
   if(state.view==='week') return renderWeekView();
+  if(state.view==='mine') return renderMyBookingsView();
   if(state.view==='qr') return renderQrView();
   if(state.view==='admin') return state.isAdmin ? renderAdminView() : renderNoAccess();
   return '';
@@ -839,7 +867,8 @@ function renderDayView(){
     const blocks = rBookings.map(b=>{
       const top = (timeToMin(b.startTime)-slots[0])/state.settings.bookingIntervalMinutes*slotH;
       const height = (timeToMin(b.endTime)-timeToMin(b.startTime))/state.settings.bookingIntervalMinutes*slotH;
-      return `<div class="booking-block" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-4)}px;background:${r.color}33;border-color:${r.color};">
+      const mineCls = state.myBookings.includes(b.id) ? ' mine' : '';
+      return `<div class="booking-block${mineCls}" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-4)}px;background:${r.color}33;border-color:${r.color};">
         <div class="bt">${escapeHtml(b.title||b.name)}</div>
         <div class="bc">${hhmm(b.startTime)}–${hhmm(b.endTime)} · ${escapeHtml(b.company||'')}</div>
       </div>`;
@@ -917,7 +946,8 @@ function renderWeekView(){
     const blocks = rBookings.map(b=>{
       const top = (timeToMin(b.startTime)-slots[0])/state.settings.bookingIntervalMinutes*slotH;
       const height = (timeToMin(b.endTime)-timeToMin(b.startTime))/state.settings.bookingIntervalMinutes*slotH;
-      return `<div class="booking-block" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-3)}px;background:${room.color}33;border-color:${room.color};">
+      const mineCls = state.myBookings.includes(b.id) ? ' mine' : '';
+      return `<div class="booking-block${mineCls}" data-booking="${b.id}" style="top:${top}px;height:${Math.max(height,slotH-3)}px;background:${room.color}33;border-color:${room.color};">
         <div class="bt" style="font-size:10.5px;">${escapeHtml(b.title||b.name)}</div>
         <div class="bc" style="font-size:9px;">${hhmm(b.startTime)}–${hhmm(b.endTime)}</div>
       </div>`;
@@ -963,6 +993,52 @@ function attachWeekEvents(){
 }
 
 /* ---------------- QR View ---------------- */
+/* ---------------- My Bookings View ---------------- */
+function renderMyBookingsView(){
+  const mine = state.bookings.filter(b=>state.myBookings.includes(b.id));
+  if(!mine.length){
+    return `<div class="empty-state">${t('noMyBookings')}</div>`;
+  }
+  mine.sort((a,b)=> (a.date+a.startTime).localeCompare(b.date+b.startTime));
+  const todayStr = fmtDate(new Date());
+  const upcoming = mine.filter(b=> b.date >= todayStr);
+  const past = mine.filter(b=> b.date < todayStr).reverse();
+
+  function renderItem(b){
+    const room = state.rooms.find(r=>r.id===b.roomId);
+    const d = parseDate(b.date);
+    return `
+    <div class="my-booking-item" data-booking="${b.id}" style="border-left-color:${room?room.color:'var(--border)'}">
+      <div class="mb-date">
+        <div class="mb-day">${pad(d.getDate())}.${pad(d.getMonth()+1)}.</div>
+        <div class="mb-weekday">${d.toLocaleDateString(localeForLang(state.uiLang),{weekday:'short'})}</div>
+      </div>
+      <div class="mb-info">
+        <div class="mb-room" style="color:${room?room.color:'var(--text)'}">${escapeHtml(room?room.name:'?')}${b.seriesId?` <span class="hint" style="display:inline;text-transform:none;">(${t('partOfSeries')})</span>`:''}</div>
+        <div class="mb-time mono">${hhmm(b.startTime)}–${hhmm(b.endTime)}</div>
+        ${b.title ? `<div class="mb-title">${escapeHtml(b.title)}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  return `
+    ${upcoming.length ? `
+      <div class="section-title" style="margin-top:0;">${t('upcoming')}</div>
+      <div class="my-bookings-list">${upcoming.map(renderItem).join('')}</div>
+    ` : `<div class="empty-state">${t('noMyBookings')}</div>`}
+    ${past.length ? `
+      <div class="section-title">${t('pastBookings')}</div>
+      <div class="my-bookings-list">${past.map(renderItem).join('')}</div>
+    ` : ''}
+  `;
+}
+
+function attachMyBookingsEvents(){
+  document.querySelectorAll('.my-booking-item').forEach(el=>{
+    el.onclick = ()=> openBookingDetail(el.getAttribute('data-booking'));
+  });
+}
+
 function renderQrView(){
   const rooms = activeRooms();
   if(!rooms.length) return `<div class="empty-state">${t('noActiveRooms')}</div>`;
